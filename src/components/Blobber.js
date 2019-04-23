@@ -4,46 +4,64 @@ import * as pixi from 'pixi.js'
 import { randomRange } from '../utils/random';
 import _map from 'lodash/map';
 import './Blobber.scss';
+import { timingSafeEqual } from 'crypto';
 
 const TAU = Math.PI * 2;
 export class Blobber extends Component {
   app = null;
+  container = null;
   blob = null;
   anchors = null;
   controlPoints = null;
   properties = null;
-  // constructor() {
-  //   super();
-  // }
+
+  constructor(props) {
+    super();
+    // TODO: move to state
+    this.app = props.app;
+    // this.color = props.color;
+    // this.radius = props.radius;
+  }
 
   componentDidMount() {
-    this.app = new pixi.Application({
-      width: 800,
-      height: 800,
-      antialias: true,
-      transparent: false,
-      resolution: 1,
-      backgroundColor: 0x222222,
-    });
-    document.body.appendChild(this.app.view);
+    // this.app = new pixi.Application({
+    //   width: 800,
+    //   height: 800,
+    //   antialias: true,
+    //   transparent: false,
+    //   resolution: 1,
+    //   backgroundColor: 0x222222,
+    // });
+    // document.body.appendChild(this.app.view);
+    // console.log(this.app);
+
+
+    
+    this.container = new pixi.Container();
+    this.blob = new pixi.Graphics();
+    this.anchors = new pixi.Graphics();
+
+    this.container.addChild(this.blob);
+    this.container.addChild(this.anchors);
+    this.app.stage.addChild(this.container);
+
+    this.blob.filters = [new pixi.filters.BlurFilter(this.props.radius / 10)];
+    this.container.x = this.props.x;
+    this.container.y = this.props.y;
 
     this.properties = this.createBasicProperties();
     this.controlPoints = this.createControlPoints();
 
-    this.blob = new pixi.Graphics();
-    this.anchors = new pixi.Graphics();
-
     this.drawBlob();
     this.drawAnchors();
-    console.table();
     this.animateBlob();
     this.update();
   }
 
   createBasicProperties() {
-    let radius = randomRange(20, 150);
-    let x = 200;
-    let y = 200;
+    let radius = randomRange(this.props.radius * .9, this.props.radius * 1.1);
+    let x = this.props.x;
+    let y = this.props.y;
     const numPoints = 4;
 
     return {
@@ -51,6 +69,7 @@ export class Blobber extends Component {
       x,
       y,
       numPoints,
+      color: this.props.color,
     };
   }
 
@@ -59,8 +78,8 @@ export class Blobber extends Component {
     let { radius: circleRadius, x, y, numPoints } = this.properties;
     for (let i = 0; i < numPoints; i++) {
       const circleAngle = TAU * i / numPoints;
-      const circleX = x + circleRadius * Math.cos(circleAngle);
-      const circleY = y + circleRadius * Math.sin(circleAngle);
+      const circleX = 0 + circleRadius * Math.cos(circleAngle);
+      const circleY = 0 + circleRadius * Math.sin(circleAngle);
       // controlPoints.push({
       //   lengthA: randomRange(circleRadius * .2, circleRadius),
       //   lengthB: randomRange(circleRadius * .2, circleRadius),
@@ -85,25 +104,29 @@ export class Blobber extends Component {
   generateControlPointFromCircle(circlePoint) {
     const { radius: circleRadius, x, y, numPoints } = this.properties;
     const { circleAngle, circleX, circleY } = circlePoint;
+    const maxLength = circleRadius / numPoints * 4;
     return {
       ...circlePoint,
+      // circleX: 0 + circleRadius * Math.cos(circleAngle),
+      // circleY: 0 + circleRadius * Math.sin(circleAngle),
 
-      lengthA: randomRange(circleRadius * .2, circleRadius),
-      lengthB: randomRange(circleRadius * .2, circleRadius),
+      lengthA: randomRange(maxLength * .2, maxLength),
+      lengthB: randomRange(maxLength * .2, maxLength),
       angle: circleAngle - Math.PI / 2 + randomRange(-TAU / 20, TAU / 20), // should be tangent
-      x: circleX + randomRange(1, circleRadius / 3),
-      y: circleY + randomRange(1, circleRadius / 3),
+      x: circleX + randomRange(1, circleRadius / 5),
+      y: circleY + randomRange(1, circleRadius / 5),
     }
   }
 
   drawBlob() {
+    const { color } = this.properties;
     const controlPoints = this.controlPoints;
     const getAnchorPoint = this.accessAnchorPoints(controlPoints);
 
     const blob = this.blob;
     blob.clear();
 
-    blob.beginFill(0x66CCFF, 1);
+    blob.beginFill(color, 1);
     // blob.lineStyle(2, 0xff0000, 1);
     const firstPoint = controlPoints[0];
     blob.moveTo(firstPoint.x, firstPoint.y);
@@ -142,18 +165,18 @@ export class Blobber extends Component {
     }
     // blob.lineTo(firstPoint.x, firstPoint.y);
     blob.endFill();
-    this.app.stage.addChild(blob);
 
     return blob;
   }
 
   // for debug
   drawAnchors() {
+    return;
     const controlPoints = this.controlPoints;
 
     const anchors = this.anchors;
     anchors.clear();
-    anchors.lineStyle(2, 0xff0000, 1);
+    anchors.lineStyle(2, 0xffffff, 1);
     for (let point of controlPoints) {
       // anchors.moveTo(point.x, point.y);
       anchors.moveTo(point.x + Math.cos(point.angle) * point.lengthA, point.y + Math.sin(point.angle) * point.lengthA);
@@ -161,13 +184,12 @@ export class Blobber extends Component {
       anchors.lineTo(point.x + Math.cos(point.angle + Math.PI) * point.lengthB, point.y + Math.sin(point.angle + Math.PI) * point.lengthB);
     }
     // anchors.lineTo(firstPoint.x, firstPoint.y);
-    anchors.lineStyle(2, 0x00ff00, 1);
+    anchors.lineStyle(2, 0xffff00, 1);
 
     for (let point of controlPoints) {
       anchors.drawCircle(point.x, point.y, 3);
     }
 
-    this.app.stage.addChild(anchors);
     return anchors;
   }
 
@@ -206,6 +228,23 @@ export class Blobber extends Component {
       // // anchors.moveTo(point.x, point.y);
       // anchors.lineTo(point.x + Math.cos(point.angle + Math.PI) * point.lengthB, point.y + Math.sin(point.angle + Math.PI) * point.lengthB);
     }
+
+    // const size = {x: 1, y: 1, rotation: randomRange(0, TAU) };
+
+    // anime({
+    //   x: 0,
+    //   y: 0,
+    //   rotation: randomRange(0, TAU),
+    //   targets: size,
+    //   loop: true,
+
+    //   easing: 'linear',
+    //   duration: 2500,// - this.properties.radius / 300 * 2500,
+    //   update: (prop) => {
+    //     this.container.rotation = size.rotation;
+    //   }
+    // });
+    // this.container.scale = { x: 1, y: 1 };
   }
 
   animatePoint(point) {
@@ -220,10 +259,12 @@ export class Blobber extends Component {
       angle,
       x,
       y,
+      // circleX,
+      // circleY,
 
       targets: point,
       easing: 'linear',
-      duration: randomRange(200, 1500),
+      duration: randomRange(700, 2500),
       complete: () => {
         this.animatePoint(point);
       },

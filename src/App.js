@@ -25,12 +25,12 @@ class App extends Component {
 
   render() {
     const circles = [
-      { color: 0x500A28, radius: 290 },
-      { color: 0x640032, radius: 220 },
-      { color: 0x870A3C, radius: 160 },
+      // { color: 0x500A28, radius: 290 },
+      // { color: 0x640032, radius: 220 },
+      // { color: 0x870A3C, radius: 160 },
       { color: 0xAF144B, radius: 110 },
-      { color: 0xF0325A, radius: 60 },
-      { color: 0xF05A7D, radius: 30 },
+      // { color: 0xF0325A, radius: 60 },
+      // { color: 0xF05A7D, radius: 30 },
   ];
 
     return (

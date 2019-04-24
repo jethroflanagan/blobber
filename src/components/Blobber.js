@@ -4,7 +4,7 @@ import * as pixi from 'pixi.js'
 import { randomRange } from '../utils/random';
 import _map from 'lodash/map';
 import './Blobber.scss';
-import { timingSafeEqual } from 'crypto';
+import { getDistance, getAngle, normalizeAngle } from '../utils/math';
 
 const TAU = Math.PI * 2;
 export class Blobber extends Component {
@@ -19,24 +19,9 @@ export class Blobber extends Component {
     super();
     // TODO: move to state
     this.app = props.app;
-    // this.color = props.color;
-    // this.radius = props.radius;
   }
 
   componentDidMount() {
-    // this.app = new pixi.Application({
-    //   width: 800,
-    //   height: 800,
-    //   antialias: true,
-    //   transparent: false,
-    //   resolution: 1,
-    //   backgroundColor: 0x222222,
-    // });
-    // document.body.appendChild(this.app.view);
-    // console.log(this.app);
-
-
-    
     this.container = new pixi.Container();
     this.blob = new pixi.Graphics();
     this.anchors = new pixi.Graphics();
@@ -45,7 +30,7 @@ export class Blobber extends Component {
     this.container.addChild(this.anchors);
     this.app.stage.addChild(this.container);
 
-    this.blob.filters = [new pixi.filters.BlurFilter(this.props.radius / 10)];
+    // this.blob.filters = [new pixi.filters.BlurFilter(this.props.radius / 10)];
     this.container.x = this.props.x;
     this.container.y = this.props.y;
 
@@ -53,9 +38,10 @@ export class Blobber extends Component {
     this.controlPoints = this.createControlPoints();
 
     this.drawBlob();
-    this.drawAnchors();
-    this.animateBlob();
+    // this.drawAnchors();
+    // this.animateBlob();
     this.update();
+    document.addEventListener('mousemove', e => this.onMouseMove(e));
   }
 
   createBasicProperties() {
@@ -75,21 +61,11 @@ export class Blobber extends Component {
 
   createControlPoints() {
     const controlPoints = [];
-    let { radius: circleRadius, x, y, numPoints } = this.properties;
+    let { radius: circleRadius, numPoints } = this.properties;
     for (let i = 0; i < numPoints; i++) {
       const circleAngle = TAU * i / numPoints;
       const circleX = 0 + circleRadius * Math.cos(circleAngle);
       const circleY = 0 + circleRadius * Math.sin(circleAngle);
-      // controlPoints.push({
-      //   lengthA: randomRange(circleRadius * .2, circleRadius),
-      //   lengthB: randomRange(circleRadius * .2, circleRadius),
-      //   angle: circleAngle - Math.PI / 2 + randomRange(-TAU / 20, TAU / 20), // should be tangent
-      //   x: circleX + randomRange(1, circleRadius / 3),
-      //   y: circleY + randomRange(1, circleRadius / 3),
-      //   circleAngle,
-      //   circleX,
-      //   circleY,
-      // });
       controlPoints.push(
         this.generateControlPointFromCircle({
             circleAngle,
@@ -102,9 +78,10 @@ export class Blobber extends Component {
   }
 
   generateControlPointFromCircle(circlePoint) {
-    const { radius: circleRadius, x, y, numPoints } = this.properties;
+    const { radius: circleRadius, numPoints } = this.properties;
     const { circleAngle, circleX, circleY } = circlePoint;
     const maxLength = circleRadius / numPoints * 4;
+    const pointAngle = (circleAngle - Math.PI / 2) % TAU;// + randomRange(-TAU / 20, TAU / 20);
     return {
       ...circlePoint,
       // circleX: 0 + circleRadius * Math.cos(circleAngle),
@@ -112,7 +89,8 @@ export class Blobber extends Component {
 
       lengthA: randomRange(maxLength * .2, maxLength),
       lengthB: randomRange(maxLength * .2, maxLength),
-      angle: circleAngle - Math.PI / 2 + randomRange(-TAU / 20, TAU / 20), // should be tangent
+      angle: pointAngle, // tangent
+      originalAngle: pointAngle, // save for reference
       x: circleX + randomRange(1, circleRadius / 5),
       y: circleY + randomRange(1, circleRadius / 5),
     }
@@ -146,10 +124,7 @@ export class Blobber extends Component {
       if (endIndex >= controlPoints.length) {
         endIndex = 0;
       }
-      let startPoint = controlPoints[i];
       let endPoint = controlPoints[endIndex];
-      // blob.lineTo(point.x, point.y);
-      const point = controlPoints[i];
       const anchorA = getAnchorPoint(i, 1);
       const anchorB = getAnchorPoint(endIndex, 0);
       blob.bezierCurveTo(
@@ -157,13 +132,7 @@ export class Blobber extends Component {
         anchorB.x, anchorB.y,
         endPoint.x, endPoint.y
       );
-
-      // blob.lineTo(point.x + Math.cos(point.angle) * point.lengthA, point.y + Math.sin(point.angle) * point.lengthA);
-      // blob.lineTo(point.x + Math.cos(point.angle + Math.PI) * point.lengthB, point.y + Math.sin(point.angle + Math.PI) * point.lengthB);
-      // blob.lineTo(controlPoints[i].x, controlPoints[i].y);
-
     }
-    // blob.lineTo(firstPoint.x, firstPoint.y);
     blob.endFill();
 
     return blob;
@@ -171,7 +140,6 @@ export class Blobber extends Component {
 
   // for debug
   drawAnchors() {
-    return;
     const controlPoints = this.controlPoints;
 
     const anchors = this.anchors;
@@ -209,49 +177,12 @@ export class Blobber extends Component {
 
   animateBlob() {
     const controlPoints = this.controlPoints;
-    // const { radius, x, y } = this.properties;
     for (let point of controlPoints) {
       this.animatePoint(point);
-      // anime({
-      //   targets: point,
-      //   easing: 'linear',
-      //   lengthA: () => randomRange(radius * .2, radius),
-      //   duration: 1000,
-      //   // loop: true,
-      //   // direction: 'alternate',
-      //   update: (animation) => {
-      //     // console.table(this.controlPoints);
-      //   },
-      // });
-      // anchors.moveTo(point.x, point.y);
-      // anchors.moveTo(point.x + Math.cos(point.angle) * point.lengthA, point.y + Math.sin(point.angle) * point.lengthA);
-      // // anchors.moveTo(point.x, point.y);
-      // anchors.lineTo(point.x + Math.cos(point.angle + Math.PI) * point.lengthB, point.y + Math.sin(point.angle + Math.PI) * point.lengthB);
     }
-
-    // const size = {x: 1, y: 1, rotation: randomRange(0, TAU) };
-
-    // anime({
-    //   x: 0,
-    //   y: 0,
-    //   rotation: randomRange(0, TAU),
-    //   targets: size,
-    //   loop: true,
-
-    //   easing: 'linear',
-    //   duration: 2500,// - this.properties.radius / 300 * 2500,
-    //   update: (prop) => {
-    //     this.container.rotation = size.rotation;
-    //   }
-    // });
-    // this.container.scale = { x: 1, y: 1 };
   }
 
   animatePoint(point) {
-    // const { radius } = this.properties;
-    // const { circleAngle, circleX, circleY } = point;
-    // console.log(circleAngle + randomRange(-.1, .1))
-
     const { lengthA, lengthB, angle, x, y } = this.generateControlPointFromCircle(point);
     anime({
       lengthA,
@@ -277,6 +208,56 @@ export class Blobber extends Component {
       this.drawAnchors();
       this.update();
     });
+  }
+
+  onMouseMove(e) {
+    const { x, y, radius } = this.properties;
+    const MAX_DISTANCE = 150;
+    const position = {x: e.pageX - x, y: e.pageY - y};
+    for (const point of this.controlPoints) {
+      const distance = getDistance(point.circleX, point.circleY, position.x, position.y);
+      let targetAngle = point.originalAngle;
+      if (distance < 100) {
+        const effect = 1 - Math.min(distance / MAX_DISTANCE, 1);
+        point.x = effect * -(point.circleX - position.x) + point.circleX;
+        point.y = effect * -(point.circleY - position.y) + point.circleY;
+
+        let offsetAngle = -Math.PI / 2;
+        let angle = getAngle(position.x, position.y, point.circleX, point.circleY) - Math.PI;
+        if (getDistance(0, 0, position.x, position.y) < radius) {
+          angle -= Math.PI;
+        }
+        // const diffAngle = (1-effect) * (angle) + offsetAngle + effect * point.originalAngle;
+        // point.angle = angle + offsetAngle;
+        // if (point.circleAngle === 0) {
+        //   console.log(point.angle, diffAngle);
+        // }
+        targetAngle = angle + offsetAngle;
+      }
+      else {
+        point.x = point.circleX;
+        point.y = point.circleY;
+        targetAngle = point.originalAngle;
+      }
+
+      targetAngle = normalizeAngle(targetAngle);
+
+      const pointAngle = normalizeAngle(point.angle);
+
+      // short rotation
+      if (Math.abs(point.angle + TAU - targetAngle) < Math.abs(point.angle - targetAngle)) {
+        point.angle += TAU;
+      }
+
+      anime({
+        targets: point,
+        angle: targetAngle,
+
+        duration: 300,
+        ease: 'easeOutQuart',
+      });
+
+    }
   }
 
   render() {

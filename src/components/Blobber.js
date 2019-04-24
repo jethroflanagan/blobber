@@ -4,7 +4,7 @@ import * as pixi from 'pixi.js'
 import { randomRange } from '../utils/random';
 import _map from 'lodash/map';
 import './Blobber.scss';
-import { getDistance, getAngle, normalizeAngle } from '../utils/math';
+import { getDistance, getAngle, normalizeAngle, toDegrees, getShortAngle } from '../utils/math';
 
 const TAU = Math.PI * 2;
 export class Blobber extends Component {
@@ -81,7 +81,7 @@ export class Blobber extends Component {
     const { radius: circleRadius, numPoints } = this.properties;
     const { circleAngle, circleX, circleY } = circlePoint;
     const maxLength = circleRadius / numPoints * 4;
-    const pointAngle = (circleAngle - Math.PI / 2) % TAU;// + randomRange(-TAU / 20, TAU / 20);
+    const pointAngle = (circleAngle - Math.PI / 2) % TAU + randomRange(-TAU / 20, TAU / 20);
     return {
       ...circlePoint,
       // circleX: 0 + circleRadius * Math.cos(circleAngle),
@@ -216,46 +216,66 @@ export class Blobber extends Component {
     const position = {x: e.pageX - x, y: e.pageY - y};
     for (const point of this.controlPoints) {
       const distance = getDistance(point.circleX, point.circleY, position.x, position.y);
-      let targetAngle = point.originalAngle;
-      if (distance < 100) {
-        const effect = 1 - Math.min(distance / MAX_DISTANCE, 1);
-        point.x = effect * -(point.circleX - position.x) + point.circleX;
-        point.y = effect * -(point.circleY - position.y) + point.circleY;
+      let target = {
+        angle: point.originalAngle,
+        x: point.circleX,
+        y: point.circleY,
+      };
+      if (distance < MAX_DISTANCE) {
+        const distanceEffect = 1 - (distance / MAX_DISTANCE) ** .7;
+        target.x = distanceEffect * position.x + (1-distanceEffect) * point.circleX;
+        target.y = distanceEffect * position.y + (1-distanceEffect) * point.circleY;
 
-        let offsetAngle = -Math.PI / 2;
-        let angle = getAngle(position.x, position.y, point.circleX, point.circleY) - Math.PI;
-        if (getDistance(0, 0, position.x, position.y) < radius) {
-          angle -= Math.PI;
+        target.angle = getAngle(point.x, point.y, position.x, position.y);
+        if (normalizeAngle(point.circleAngle - target.angle) > Math.PI) {
+          target.angle -= Math.PI;
         }
-        // const diffAngle = (1-effect) * (angle) + offsetAngle + effect * point.originalAngle;
-        // point.angle = angle + offsetAngle;
-        // if (point.circleAngle === 0) {
-        //   console.log(point.angle, diffAngle);
-        // }
-        targetAngle = angle + offsetAngle;
+
+        let maxAngle = Math.PI;
+        let targetAngleDiff = normalizeAngle(getShortAngle(point.circleAngle, target.angle));
+        let angleEffect = targetAngleDiff / maxAngle;
+
+        if (targetAngleDiff < Math.PI / 2) {
+          angleEffect = 1 - angleEffect;
+        }
+
+
+        // shift range so 0 and 100 are 0 and 50 is 100 ([0 50 100] -> [0 100 0])
+        angleEffect = 1 - (angleEffect - .5) / .5;
+
+        // change distance [0 -> MAX -> CLAMP -> 100] -> [0 100 0 0] (clamped at MAX)
+        const ANGLE_DISTANCE_CLAMP_PERCENT = .8;
+        const ANGLE_DISTANCE_MAX_PERCENT = .5;
+        const angleDistanceMax = MAX_DISTANCE * ANGLE_DISTANCE_MAX_PERCENT;
+        let angleDistanceEffect = 0;
+        
+        if (distance <= angleDistanceMax) {
+          angleDistanceEffect = distance / angleDistanceMax;
+        }
+        else if (distance <= MAX_DISTANCE * ANGLE_DISTANCE_CLAMP_PERCENT) {
+          angleDistanceEffect = 1 - (distance - angleDistanceMax) / ((MAX_DISTANCE * ANGLE_DISTANCE_CLAMP_PERCENT - angleDistanceMax));
+        }
+        // soften by distance
+        angleEffect *= angleDistanceEffect;
+
+        if (point.circleAngle === 0) {
+          console.log(Math.round(angleDistanceEffect * 100));
+        }
+
+        target.angle = point.originalAngle - angleEffect * getShortAngle(point.originalAngle, target.angle);
       }
-      else {
-        point.x = point.circleX;
-        point.y = point.circleY;
-        targetAngle = point.originalAngle;
-      }
 
-      targetAngle = normalizeAngle(targetAngle);
+      point.x = target.x;
+      point.y = target.y;
+      point.angle = target.angle;
 
-      const pointAngle = normalizeAngle(point.angle);
+      // anime({
+      //   targets: point,
+      //   angle: targetAngle,
 
-      // short rotation
-      if (Math.abs(point.angle + TAU - targetAngle) < Math.abs(point.angle - targetAngle)) {
-        point.angle += TAU;
-      }
-
-      anime({
-        targets: point,
-        angle: targetAngle,
-
-        duration: 300,
-        ease: 'easeOutQuart',
-      });
+      //   duration: 300,
+      //   ease: 'easeOutQuart',
+      // });
 
     }
   }

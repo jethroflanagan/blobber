@@ -8,3 +8,16 @@ export const normalizeAngle = (angle) => {
   }
   return angle % (Math.PI * 2);
 }
+
+export const toDegrees = (angle) => angle * 180 / Math.PI;
+
+export const getShortAngle = (angle1, angle2) => {
+  let diff = normalizeAngle(angle1) - normalizeAngle(angle2);
+
+  if (diff > Math.PI)
+    diff -= Math.PI * 2;
+  if (diff < -Math.PI)
+    diff += Math.PI * 2;
+
+  return diff;
+}

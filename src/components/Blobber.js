@@ -39,7 +39,7 @@ export class Blobber extends Component {
 
     this.drawBlob();
     // this.drawAnchors();
-    // this.animateBlob();
+    this.animateBlob();
     this.update();
     document.addEventListener('mousemove', e => this.onMouseMove(e));
   }
@@ -186,9 +186,9 @@ export class Blobber extends Component {
     }
   }
 
-  animatePoint(point) {
+  animatePoint(point, ease) {
     const { lengthA, lengthB, angle, x, y } = this.generateControlPointFromCircle(point);
-    anime({
+    point.animation = anime({
       lengthA,
       lengthB,
       angle,
@@ -198,7 +198,7 @@ export class Blobber extends Component {
       // circleY,
 
       targets: point,
-      easing: 'linear',
+      easing: ease || 'easeInOutCubic',
       duration: randomRange(700, 2500),
       complete: () => {
         this.animatePoint(point);
@@ -224,10 +224,14 @@ export class Blobber extends Component {
         angle: point.originalAngle,
         x: point.circleX,
         y: point.circleY,
-        lengthA: point.lengthA,
-        lengthB: point.lengthB,
+        // lengthA: point.lengthA,
+        // lengthB: point.lengthB,
       };
       if (distance < MAX_DISTANCE) {
+        if (point.animation) {
+          point.animation.pause();
+          point.animation = null;
+        }
         const distanceEffect = 1 - (distance / MAX_DISTANCE) ** .7;
         target.x = distanceEffect * position.x + (1-distanceEffect) * point.circleX;
         target.y = distanceEffect * position.y + (1-distanceEffect) * point.circleY;
@@ -271,20 +275,28 @@ export class Blobber extends Component {
         target.angle = point.originalAngle - angleEffect * getShortAngle(point.originalAngle, target.angle);
 
       }
+      else {
+        if (!point.animation) {
+          this.animatePoint(point, 'easeInOutCubic');
+        }
 
-      point.x = target.x;
-      point.y = target.y;
-      point.angle = target.angle;
-      point.lengthA = target.lengthA;
-      point.lengthB = target.lengthB;
+      }
 
-      // anime({
-      //   targets: point,
-      //   angle: targetAngle,
+      // point.x = target.x;
+      // point.y = target.y;
+      // point.angle = target.angle;
+      // point.lengthA = target.lengthA;
+      // point.lengthB = target.lengthB;
 
-      //   duration: 300,
-      //   ease: 'easeOutQuart',
-      // });
+      anime({
+        targets: point,
+        x: target.x,
+        y: target.y,
+        angle: target.angle,
+
+        duration: 300,
+        ease: 'spring(1, 80, 10, 0)',
+      });
 
     }
   }

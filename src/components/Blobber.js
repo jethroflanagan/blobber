@@ -82,13 +82,17 @@ export class Blobber extends Component {
     const { circleAngle, circleX, circleY } = circlePoint;
     const maxLength = circleRadius / numPoints * 4;
     const pointAngle = (circleAngle - Math.PI / 2) % TAU + randomRange(-TAU / 20, TAU / 20);
+    const lengthA = randomRange(maxLength * .2, maxLength);
+    const lengthB = randomRange(maxLength * .2, maxLength);
     return {
       ...circlePoint,
       // circleX: 0 + circleRadius * Math.cos(circleAngle),
       // circleY: 0 + circleRadius * Math.sin(circleAngle),
 
-      lengthA: randomRange(maxLength * .2, maxLength),
-      lengthB: randomRange(maxLength * .2, maxLength),
+      lengthA,
+      lengthB,
+      originalLengthA: lengthA,
+      originalLengthB: lengthB,
       angle: pointAngle, // tangent
       originalAngle: pointAngle, // save for reference
       x: circleX + randomRange(1, circleRadius / 5),
@@ -205,14 +209,14 @@ export class Blobber extends Component {
   update() {
     requestAnimationFrame(() => {
       this.drawBlob();
-      this.drawAnchors();
+      // this.drawAnchors();
       this.update();
     });
   }
 
   onMouseMove(e) {
     const { x, y, radius } = this.properties;
-    const MAX_DISTANCE = 150;
+    const MAX_DISTANCE = radius * 1.5;
     const position = {x: e.pageX - x, y: e.pageY - y};
     for (const point of this.controlPoints) {
       const distance = getDistance(point.circleX, point.circleY, position.x, position.y);
@@ -220,6 +224,8 @@ export class Blobber extends Component {
         angle: point.originalAngle,
         x: point.circleX,
         y: point.circleY,
+        lengthA: point.lengthA,
+        lengthB: point.lengthB,
       };
       if (distance < MAX_DISTANCE) {
         const distanceEffect = 1 - (distance / MAX_DISTANCE) ** .7;
@@ -248,7 +254,7 @@ export class Blobber extends Component {
         const ANGLE_DISTANCE_MAX_PERCENT = .5;
         const angleDistanceMax = MAX_DISTANCE * ANGLE_DISTANCE_MAX_PERCENT;
         let angleDistanceEffect = 0;
-        
+
         if (distance <= angleDistanceMax) {
           angleDistanceEffect = distance / angleDistanceMax;
         }
@@ -258,16 +264,19 @@ export class Blobber extends Component {
         // soften by distance
         angleEffect *= angleDistanceEffect;
 
-        if (point.circleAngle === 0) {
-          console.log(Math.round(angleDistanceEffect * 100));
-        }
+        // if (point.circleAngle === 0) {
+        //   console.log(Math.round(angleDistanceEffect * 100));
+        // }
 
         target.angle = point.originalAngle - angleEffect * getShortAngle(point.originalAngle, target.angle);
+
       }
 
       point.x = target.x;
       point.y = target.y;
       point.angle = target.angle;
+      point.lengthA = target.lengthA;
+      point.lengthB = target.lengthB;
 
       // anime({
       //   targets: point,

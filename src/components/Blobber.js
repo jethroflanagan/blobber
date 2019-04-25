@@ -9,11 +9,12 @@ import { getDistance, getAngle, normalizeAngle, toDegrees, getShortAngle } from 
 const TAU = Math.PI * 2;
 export class Blobber extends Component {
   app = null;
-  container = null;
-  blob = null;
+  containerLayer = null;
+  blobLayer = null;
+  anchorsLayer = null;
   anchors = null;
-  controlPoints = null;
   properties = null;
+  labelsLayer = null;
 
   constructor(props) {
     super();
@@ -22,26 +23,61 @@ export class Blobber extends Component {
   }
 
   componentDidMount() {
-    this.container = new pixi.Container();
-    this.blob = new pixi.Graphics();
-    this.anchors = new pixi.Graphics();
+    this.containerLayer = new pixi.Container();
+    this.labelsLayer = new pixi.Container();
+    this.blobLayer = new pixi.Graphics();
+    this.anchorsLayer = new pixi.Graphics();
 
-    this.container.addChild(this.blob);
-    this.container.addChild(this.anchors);
-    this.app.stage.addChild(this.container);
+    this.containerLayer.addChild(this.blobLayer);
+    this.containerLayer.addChild(this.anchorsLayer);
+    this.containerLayer.addChild(this.labelsLayer);
+    this.app.stage.addChild(this.containerLayer);
 
     // this.blob.filters = [new pixi.filters.BlurFilter(this.props.radius / 10)];
-    this.container.x = this.props.x;
-    this.container.y = this.props.y;
+    // this.blob.filters[0].blendMode = pixi.BLEND_MODES.ADD;
+    this.containerLayer.x = this.props.x;
+    this.containerLayer.y = this.props.y;
 
     this.properties = this.createBasicProperties();
-    this.controlPoints = this.createControlPoints();
-
+    this.anchors = this.createAnchorPoints();
+    this.createLabel(this.props.label);
+    // this.showIntro();
     this.drawBlob();
     // this.drawAnchors();
     this.animateBlob();
     this.update();
     document.addEventListener('mousemove', e => this.onMouseMove(e));
+  }
+
+  showIntro() {
+    // first transition
+    this.anchors[0].x = 0;
+    this.anchors[0].y = 0;
+    this.anchors[0].lengthA = this.anchors[0].lengthB = 0;
+
+    this.anchors[1].x = 0;
+    this.anchors[1].y = 0;
+    this.anchors[1].lengthA = this.anchors[0].lengthB = 0;
+
+    this.anchors[2].x =  0;
+    this.anchors[2].y = 0;
+    this.anchors[2].lengthA = this.anchors[0].lengthB = 0;
+
+    this.anchors[3].x =  0;
+    this.anchors[3].y = 0;
+    this.anchors[3].lengthA = this.anchors[0].lengthB = 0;
+
+    anime({
+        //  = [new pixi.filters.BlurFilter(this.props.radius / 10)];
+        targets: this.blobLayer.filters[0],
+        blurX: 0,
+        blurY: 0,
+        duration: 9000 * this.properties.radius / 300,
+        easing: 'cubicBezier(.5, .05, .1, .3)',
+        complete: () => {
+          this.blobLayer.filters = [];
+        }
+    });
   }
 
   createBasicProperties() {
@@ -59,27 +95,32 @@ export class Blobber extends Component {
     };
   }
 
-  createControlPoints() {
-    const controlPoints = [];
+  createAnchorPoints() {
+    const anchorPoints = [];
     let { radius: circleRadius, numPoints } = this.properties;
     for (let i = 0; i < numPoints; i++) {
       const circleAngle = TAU * i / numPoints;
       const circleX = 0 + circleRadius * Math.cos(circleAngle);
       const circleY = 0 + circleRadius * Math.sin(circleAngle);
-      controlPoints.push(
+      anchorPoints.push(
         this.generateControlPointFromCircle({
-            circleAngle,
-            circleX,
-            circleY,
+          circleAngle,
+          circleX,
+          circleY,
+          // keep ref
+          originalCircleX: circleX,
+          originalCircleY: circleY,
+          neighborA: (i - 1 < 0 ? numPoints - 1 : i - 1), // index of neighbor on lengthA side
+          neighborB: (i + 1 > numPoints - 1 ? 0 : i + 1), // index of neighbor on lengthB side
         })
       );
     }
-    return controlPoints;
+    return anchorPoints;
   }
 
   generateControlPointFromCircle(circlePoint) {
     const { radius: circleRadius, numPoints } = this.properties;
-    const { circleAngle, circleX, circleY } = circlePoint;
+    const { circleAngle, originalCircleX: circleX, originalCircleY: circleY } = circlePoint;
     const maxLength = circleRadius / numPoints * 4;
     const pointAngle = (circleAngle - Math.PI / 2) % TAU + randomRange(-TAU / 20, TAU / 20);
     const lengthA = randomRange(maxLength * .2, maxLength);
@@ -93,6 +134,9 @@ export class Blobber extends Component {
       lengthB,
       originalLengthA: lengthA,
       originalLengthB: lengthB,
+      // used to smoothly transition between animated/interacted
+      animatedLengthA: lengthA,
+      animatedLengthB: lengthB,
       angle: pointAngle, // tangent
       originalAngle: pointAngle, // save for reference
       x: circleX + randomRange(1, circleRadius / 5),
@@ -102,10 +146,10 @@ export class Blobber extends Component {
 
   drawBlob() {
     const { color } = this.properties;
-    const controlPoints = this.controlPoints;
+    const controlPoints = this.anchors;
     const getAnchorPoint = this.accessAnchorPoints(controlPoints);
 
-    const blob = this.blob;
+    const blob = this.blobLayer;
     blob.clear();
 
     blob.beginFill(color, 1);
@@ -144,11 +188,11 @@ export class Blobber extends Component {
 
   // for debug
   drawAnchors() {
-    const controlPoints = this.controlPoints;
+    const controlPoints = this.anchors;
 
-    const anchors = this.anchors;
+    const anchors = this.anchorsLayer;
     anchors.clear();
-    anchors.lineStyle(2, 0xffffff, 1);
+    anchors.lineStyle(2, 0xffffff, .7);
     for (let point of controlPoints) {
       // anchors.moveTo(point.x, point.y);
       anchors.moveTo(point.x + Math.cos(point.angle) * point.lengthA, point.y + Math.sin(point.angle) * point.lengthA);
@@ -156,9 +200,14 @@ export class Blobber extends Component {
       anchors.lineTo(point.x + Math.cos(point.angle + Math.PI) * point.lengthB, point.y + Math.sin(point.angle + Math.PI) * point.lengthB);
     }
     // anchors.lineTo(firstPoint.x, firstPoint.y);
-    anchors.lineStyle(2, 0xffff00, 1);
 
     for (let point of controlPoints) {
+      if (point.animation) {
+        anchors.lineStyle(4, 0xffff00, 1);
+      }
+      else {
+        anchors.lineStyle(4, 0x00ff00, 1);
+      }
       anchors.drawCircle(point.x, point.y, 3);
     }
 
@@ -166,7 +215,7 @@ export class Blobber extends Component {
   }
 
   accessAnchorPoints() {
-    const controlPoints = this.controlPoints;
+    const controlPoints = this.anchors;
 
     return (index, side) => {
       const point = controlPoints[index];
@@ -180,7 +229,7 @@ export class Blobber extends Component {
   }
 
   animateBlob() {
-    const controlPoints = this.controlPoints;
+    const controlPoints = this.anchors;
     for (let point of controlPoints) {
       this.animatePoint(point);
     }
@@ -194,8 +243,11 @@ export class Blobber extends Component {
       angle,
       x,
       y,
-      // circleX,
-      // circleY,
+
+      // used to smoothly transition between animated/interacted
+      circleX: x,
+      circleY: y,
+
 
       targets: point,
       easing: ease || 'easeInOutCubic',
@@ -203,8 +255,45 @@ export class Blobber extends Component {
       complete: () => {
         this.animatePoint(point);
       },
+      update: (animation) => {
+        // used to smoothly transition between animated/interacted
+        point.animatedLengthA = point.lengthA;
+        point.animatedLengthB = point.lengthB;
+        if (point.label) {
+          this.updateLabel({ label: point.label, point });
+        }
+      }
     });
-}
+  }
+
+  createLabel(text) {
+    const style = new pixi.TextStyle({
+      fontFamily: 'Source Sans Pro',
+      fontSize: 16,
+      // fontStyle: 'italic',
+      fontWeight: 300,
+      fill: '#fff',
+      // fill: ['#ffffff', '#00ff99'], // gradient
+
+      dropShadow: true,
+      dropShadowColor: 'rgba(0,0,0,.1)',
+      dropShadowBlur: 7,
+      dropShadowAngle: 0,
+      dropShadowDistance: 0,
+    });
+
+    const label = new pixi.Text(text, style);
+    // label.filters = [new pixi.filters.BlurFilter(this.props.radius / 10)];
+    const target = this.anchors[1];
+    target.label = label;
+    label.target = target;
+    this.labelsLayer.addChild(label);
+  }
+
+  updateLabel({ label, point }) {
+    label.x = point.x - point.label.width / 2;
+    label.y = point.y - point.label.height - 10;
+  }
 
   update() {
     requestAnimationFrame(() => {
@@ -218,24 +307,28 @@ export class Blobber extends Component {
     const { x, y, radius } = this.properties;
     const MAX_DISTANCE = radius * 1.5;
     const position = {x: e.pageX - x, y: e.pageY - y};
-    for (const point of this.controlPoints) {
+    for (const point of this.anchors) {
       const distance = getDistance(point.circleX, point.circleY, position.x, position.y);
+      // const distance = getDistance(point.x, point.y, position.x, position.y); // SUPER blobby
       let target = {
         angle: point.originalAngle,
         x: point.circleX,
         y: point.circleY,
-        // lengthA: point.lengthA,
-        // lengthB: point.lengthB,
+        lengthA: point.lengthA,
+        lengthB: point.lengthB,
       };
       if (distance < MAX_DISTANCE) {
         if (point.animation) {
           point.animation.pause();
+          anime.remove(point);
           point.animation = null;
         }
+        // POSITION
         const distanceEffect = 1 - (distance / MAX_DISTANCE) ** .7;
         target.x = distanceEffect * position.x + (1-distanceEffect) * point.circleX;
         target.y = distanceEffect * position.y + (1-distanceEffect) * point.circleY;
 
+        // ANGLE
         target.angle = getAngle(point.x, point.y, position.x, position.y);
         if (normalizeAngle(point.circleAngle - target.angle) > Math.PI) {
           target.angle -= Math.PI;
@@ -274,29 +367,57 @@ export class Blobber extends Component {
 
         target.angle = point.originalAngle - angleEffect * getShortAngle(point.originalAngle, target.angle);
 
+        // LENGTH
+        // compare lengths to neighboring
+        const neighborA = this.anchors[point.neighborA];
+        const neighborB = this.anchors[point.neighborB];
+        const originalDistanceA = getDistance(point.circleX, point.circleY, neighborA.circleX, neighborA.circleY);
+        const originalDistanceB = getDistance(point.circleX, point.circleY, neighborB.circleX, neighborB.circleY);
+        const distanceA = getDistance(target.x, target.y, neighborA.x, neighborA.y);
+        const distanceB = getDistance(target.x, target.y, neighborB.x, neighborB.y);
+        if (neighborA.lengthB + target.lengthA > distanceA) {
+          target.lengthA = Math.pow(distanceA / originalDistanceA, 1.2) * point.animatedLengthA;
+        }
+        if (neighborB.lengthA + target.lengthB > distanceB) {
+          target.lengthB = Math.pow(distanceB / originalDistanceB, 1.2) * point.animatedLengthB;
+        }
+
+        point.x = target.x;
+        point.y = target.y;
+        point.angle = target.angle;
+        point.lengthA = target.lengthA;
+        point.lengthB = target.lengthB;
+        if (point.label) {
+          this.updateLabel({ label: point.label, point });
+        }
+        // anime({
+        //   targets: point,
+        //   // x: target.x,
+        //   // y: target.y,
+        //   // angle: target.angle,
+        //   lengthA: target.lengthA,
+        //   lengthB: target.lengthB,
+
+        //   duration: 300,
+        //   ease: 'spring(1, 80, 10, 0)',
+        // });
       }
       else {
         if (!point.animation) {
-          this.animatePoint(point, 'easeInOutCubic');
+          this.animatePoint(point);
         }
-
       }
 
-      // point.x = target.x;
-      // point.y = target.y;
-      // point.angle = target.angle;
-      // point.lengthA = target.lengthA;
-      // point.lengthB = target.lengthB;
 
-      anime({
-        targets: point,
-        x: target.x,
-        y: target.y,
-        angle: target.angle,
+      // point.animation = anime({
+      //   targets: point,
+      //   x: target.x,
+      //   y: target.y,
+      //   angle: target.angle,
 
-        duration: 300,
-        ease: 'spring(1, 80, 10, 0)',
-      });
+      //   duration: 300,
+      //   ease: 'spring(1, 80, 10, 0)',
+      // });
 
     }
   }

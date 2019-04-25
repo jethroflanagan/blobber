@@ -24,13 +24,13 @@ export class Blobber extends Component {
 
   componentDidMount() {
     this.containerLayer = new pixi.Container();
-    this.labelsLayer = new pixi.Container();
+    // this.labelsLayer = new pixi.Container();
     this.blobLayer = new pixi.Graphics();
     this.anchorsLayer = new pixi.Graphics();
 
     this.containerLayer.addChild(this.blobLayer);
     this.containerLayer.addChild(this.anchorsLayer);
-    this.containerLayer.addChild(this.labelsLayer);
+    // this.containerLayer.addChild(this.labelsLayer);
     this.app.stage.addChild(this.containerLayer);
 
     // this.blob.filters = [new pixi.filters.BlurFilter(this.props.radius / 10)];
@@ -40,7 +40,6 @@ export class Blobber extends Component {
 
     this.properties = this.createBasicProperties();
     this.anchors = this.createAnchorPoints();
-    this.createLabel(this.props.label);
     // this.showIntro();
     this.drawBlob();
     // this.drawAnchors();
@@ -266,40 +265,24 @@ export class Blobber extends Component {
     });
   }
 
-  createLabel(text) {
-    const style = new pixi.TextStyle({
-      fontFamily: 'Source Sans Pro',
-      fontSize: 16,
-      // fontStyle: 'italic',
-      fontWeight: 300,
-      fill: '#fff',
-      // fill: ['#ffffff', '#00ff99'], // gradient
-
-      dropShadow: true,
-      dropShadowColor: 'rgba(0,0,0,.1)',
-      dropShadowBlur: 7,
-      dropShadowAngle: 0,
-      dropShadowDistance: 0,
-    });
-
-    const label = new pixi.Text(text, style);
-    // label.filters = [new pixi.filters.BlurFilter(this.props.radius / 10)];
-    const target = this.anchors[1];
-    target.label = label;
-    label.target = target;
-    this.labelsLayer.addChild(label);
-  }
-
-  updateLabel({ label, point }) {
-    label.x = point.x - point.label.width / 2;
-    label.y = point.y - point.label.height - 10;
-  }
+  // updateLabel({ label, point }) {
+  //   label.x = point.x - point.label.width / 2;
+  //   label.y = point.y - point.label.height - 10;
+  // }
 
   update() {
     requestAnimationFrame(() => {
       this.drawBlob();
       // this.drawAnchors();
+      this.onUpdated();
       this.update();
+    });
+  }
+
+  onUpdated() {
+    this.props.onUpdated({
+      anchors: this.anchors,
+      properties: this.properties
     });
   }
 
@@ -387,9 +370,6 @@ export class Blobber extends Component {
         point.angle = target.angle;
         point.lengthA = target.lengthA;
         point.lengthB = target.lengthB;
-        if (point.label) {
-          this.updateLabel({ label: point.label, point });
-        }
         // anime({
         //   targets: point,
         //   // x: target.x,
@@ -420,6 +400,7 @@ export class Blobber extends Component {
       // });
 
     }
+    this.onUpdated();
   }
 
   render() {

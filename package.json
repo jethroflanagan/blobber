@@ -27,6 +27,7 @@
   "devDependencies": {
     "animejs": "^3.0.1",
     "lodash": "^4.17.11",
-    "pixi.js": "^4.8.7"
+    "pixi.js": "^4.8.7",
+    "react-svg": "^9.0.2"
   }
 }

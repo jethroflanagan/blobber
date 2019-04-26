@@ -1,0 +1,86 @@
+import React, { Component } from 'react'
+import ReactSVG from 'react-svg';
+import "./Gyro.scss";
+import { getDistance, clamp } from '../../../utils/math';
+
+const MAX_SPEED = 100;
+
+export default class Gyro extends Component {
+  constructor() {
+    super();
+    this.state = {
+      x: 0,
+      y: 0,
+      width: 297,
+      height: 297,
+      rotationX: 0,
+      rotationY: 0,
+    };
+  }
+
+  componentDidMount() {
+    document.addEventListener('mousemove', e => this.onMouseMove(e));
+    const bounds = this.refs.container.getBoundingClientRect();
+    this.setState({
+      x: bounds.x,
+      y: bounds.y,
+    });
+  }
+
+  onMouseMove(e) {
+    const EFFECT = 20;
+    // console.log(e.clientX, e.clientY);
+    const {x, y, width, height} = this.state;
+    let { clientX: mouseX, clientY: mouseY } = e;
+    mouseX = mouseX - x - width / 2;
+    mouseY = mouseY - y - height / 2;
+
+    let rotationX = -mouseX / (width / 2);
+    let rotationY = mouseY / (height / 2);
+    rotationX = clamp(rotationX, -1, 1)  * EFFECT;
+    rotationY = clamp(rotationY, -1, 1)  * EFFECT;
+
+    this.setState({
+      rotationX,
+      rotationY,
+    });
+  }
+
+  render() {
+    const { rotationX, rotationY } = this.state;
+
+    return (
+      <div className="Gyro Gyro--intro" ref="container">
+        <div className="Gyro-x" style={{ transform: `rotate3d(0, 1, 0, ${rotationX}deg)` }}>
+          <div className="Gyro-y" style={{ transform: `rotate3d(1, 0, 0, ${rotationY}deg)` }}>
+            <div className="Gyro-fill-body">
+              <ReactSVG src="./assets/rationale/gyro-fill-body.svg" />
+            </div>
+            <div className="Gyro-fill-prop Gyro-fill-prop--top-left">
+              <ReactSVG src="./assets/rationale/gyro-fill-prop.svg" />
+            </div>
+            <div className="Gyro-fill-prop Gyro-fill-prop--top-right">
+              <ReactSVG src="./assets/rationale/gyro-fill-prop.svg" />
+            </div>
+            <div className="Gyro-fill-prop Gyro-fill-prop--bottom-left">
+              <ReactSVG src="./assets/rationale/gyro-fill-prop.svg" />
+            </div>
+            <div className="Gyro-fill-prop Gyro-fill-prop--bottom-right">
+              <ReactSVG src="./assets/rationale/gyro-fill-prop.svg" />
+            </div>
+
+            <div className="Gyro-prop-connectors">
+              <ReactSVG src="./assets/rationale/gyro-prop-connectors.svg" />
+            </div>
+            <div className="Gyro-body">
+              <ReactSVG src="./assets/rationale/gyro-body.svg" />
+            </div>
+            <div className="Gyro-prop-covers">
+              <ReactSVG src="./assets/rationale/gyro-prop-covers.svg" />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}

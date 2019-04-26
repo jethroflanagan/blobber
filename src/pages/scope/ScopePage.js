@@ -2,12 +2,10 @@ import React, { Component } from 'react';
 import _map from 'lodash/map';
 import * as pixi from 'pixi.js'
 
-import { Blobber } from './components/Blobber';
-import './App.scss';
+import { Blobber } from 'src/components/Blobber';
+import './ScopePage.scss';
 
-
-
-class App extends Component {
+export class ScopePage extends Component {
   app = null;
   circles = [
     { color: 0x500A28, radius: 290, label: 'Our world' },
@@ -79,18 +77,20 @@ class App extends Component {
 
     // label.x = properties.x + point.originalCircleX + 80;
     // label.y = properties.y + point.originalCircleY - 10;
-    label.x = properties.x + point.originalCircleX - (point.originalCircleX - point.x) / 2 + 40;
+    label.x = properties.x + point.originalCircleX + 40;
     label.y = properties.y + point.originalCircleY - (point.originalCircleY - point.y) / 2 - 20;
 
     line.x = 0;
     line.y = 0;
 
+    const startX = properties.x;
+    const startY = properties.y + point.y - label.height - 0;
     line.clear();
     line.lineStyle(2, 0xffffff, 1);
-    line.moveTo(properties.x + point.x, properties.y + point.y - label.height + 5);
+    line.moveTo(startX + 3, startY);
     line.lineTo(label.x - 5, label.y + 10);
-    line.lineStyle(3, 0xffffff, 1);
-    line.drawCircle(properties.x + point.x, properties.y + point.y - label.height + 5, 2);
+    line.lineStyle(2, 0xffffff, 1);
+    line.drawCircle(startX, startY, 4);
     // console.log(label.x, label.y);
   }
 
@@ -101,11 +101,9 @@ class App extends Component {
 
   render() {
     return (
-      <div className="App">
+      <div className="Scope">
         {_map(this.circles, (circle, i) => <Blobber app={this.app} color={circle.color} radius={circle.radius} x={200} y={200} key={i} onUpdated={blob => this.onUpdateBlob({ id: i, blob })}/>)}
       </div>
     );
   }
 }
-
-export default App;

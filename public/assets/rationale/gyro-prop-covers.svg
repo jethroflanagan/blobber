@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="301px" height="301px" viewBox="0 0 301 301" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 54.1 (76490) - https://sketchapp.com -->
+    <title>prop-covers</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">
+        <g id="FDO-site-1" transform="translate(-321.000000, -979.000000)" stroke="#FFFFFF" stroke-width="3">
+            <g id="gyro-outline" transform="translate(323.000000, 981.000000)">
+                <g id="prop-covers">
+                    <path d="M106,53.0007098 C106,23.7287373 82.2712627,0 53.0007098,0 C23.7287373,0 0,23.7287373 0,53.0007098 C0,82.2712627 23.7287373,106 53.0007098,106" id="Stroke-9"></path>
+                    <path d="M244,106 C273.272364,106 297,82.2709449 297,53 C297,23.7290551 273.272364,0 244,0 C214.729055,0 191,23.7290551 191,53" id="Stroke-11"></path>
+                    <path d="M53,191 C23.7290551,191 0,214.730157 0,244.00071 C0,273.271263 23.7290551,297 53,297 C82.2709449,297 106,273.271263 106,244.00071" id="Stroke-13"></path>
+                    <path d="M191,244.00071 C191,273.271263 214.728737,297 243.99929,297 C273.271263,297 297,273.271263 297,244.00071 C297,214.728737 273.271263,191 243.99929,191" id="Stroke-15"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

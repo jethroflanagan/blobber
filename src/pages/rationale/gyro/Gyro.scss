@@ -1,0 +1,80 @@
+// w=297, h=297
+.Gyro {
+  position: relative;
+  // width: 297px;
+  // height: 297px;
+  // transform: rotate3d(0, 1, 0, 0deg);
+  &-x, &-y {
+    transform-style: preserve-3d;
+    transform-origin: center;
+    perspective: 1000px;
+    perspective-origin: center center;
+    width: 297px;
+    height: 297px;
+
+  }
+  &-x {
+    transform: rotate3d(0, 1, 0, 0);
+    transform-style: preserve-3d;
+    transition: transform .3s ease-out;
+  }
+  &-y {
+    transform: rotate3d(1, 0, 0, 0);
+    transform-style: preserve-3d;
+    transition: transform .3s ease-out;
+  }
+  &-body {
+    position: absolute;
+    left: 77px;
+    top: 77px;
+    transform: translate3d(0, 0, 50px);
+  }
+  &-prop-connectors {
+    position: absolute;
+    left: 51px;
+    top: 51px;
+    transform: translate3d(0, 0, 25px);
+  }
+  &-prop-covers {
+    position: absolute;
+    transform: translate3d(0, 0, 10px);
+  }
+
+  &-fill-body {
+    position: absolute;
+    left: 52px;
+    top: 48px;
+    transform: translate3d(0, 0, 15px);
+  }
+
+  &-fill-prop {
+    position: absolute;
+    transform: translate3d(0, 0, 0);
+    animation: gyro-prop-spin 1s linear forwards infinite;
+  }
+
+  &-fill-prop--top-left {
+    left: 3px;
+    top: 3px;
+  }
+  &-fill-prop--top-right {
+    left: 195px;
+    top: 3px;
+  }
+  &-fill-prop--bottom-left {
+    left: 3px;
+    top: 195px;
+  }
+  &-fill-prop--bottom-right {
+    left: 195px;
+    top: 195px;
+  }
+  @keyframes gyro-prop-spin {
+    0% {
+      transform: rotate(0) translate3d(0, 0, 0);
+    }
+    100% {
+      transform: rotate(360deg) translate3d(0, 0, 0);
+    }
+  }
+}

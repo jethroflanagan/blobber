@@ -21,3 +21,7 @@ export const getShortAngle = (angle1, angle2) => {
 
   return diff;
 }
+
+export const clamp = (value, min=0, max=1) => {
+  return Math.max(min || 0, Math.min(max, value));
+}

@@ -15,6 +15,7 @@ export default class Gyro extends Component {
       height: 297,
       rotationX: 0,
       rotationY: 0,
+      isIntro: true,
     };
   }
 
@@ -25,9 +26,16 @@ export default class Gyro extends Component {
       x: bounds.x,
       y: bounds.y,
     });
+    setTimeout(() => {
+      this.setState({
+        isIntro: false,
+      });
+    }, 4000);
   }
 
   onMouseMove(e) {
+    const { isIntro } = this.state;
+    if (isIntro) return;
     const EFFECT = 20;
     // console.log(e.clientX, e.clientY);
     const {x, y, width, height} = this.state;
@@ -47,12 +55,18 @@ export default class Gyro extends Component {
   }
 
   render() {
-    const { rotationX, rotationY } = this.state;
-
+    const { rotationX, rotationY, isIntro } = this.state;
+    let gyroX = {};
+    let gyroY = {};
+    if (!isIntro) {
+      gyroX = { transform: `rotate3d(0, 1, 0, ${rotationX}deg)` };
+      gyroY = { transform: `rotate3d(1, 0, 0, ${rotationY}deg)` };
+    }
+    const classNames = `Gyro ${isIntro ? 'Gyro--intro' : ''}`;
     return (
-      <div className="Gyro Gyro--intro" ref="container">
-        <div className="Gyro-x" style={{ transform: `rotate3d(0, 1, 0, ${rotationX}deg)` }}>
-          <div className="Gyro-y" style={{ transform: `rotate3d(1, 0, 0, ${rotationY}deg)` }}>
+      <div className={classNames} ref="container">
+        <div className="Gyro-x" style={gyroX}>
+          <div className="Gyro-y" style={gyroY}>
             <div className="Gyro-fill-body">
               <ReactSVG src="./assets/rationale/gyro-fill-body.svg" />
             </div>

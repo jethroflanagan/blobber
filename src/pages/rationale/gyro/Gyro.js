@@ -30,7 +30,7 @@ export default class Gyro extends Component {
       this.setState({
         isIntro: false,
       });
-    }, 4000);
+    }, 5000);
   }
 
   onMouseMove(e) {
@@ -67,30 +67,32 @@ export default class Gyro extends Component {
       <div className={classNames} ref="container">
         <div className="Gyro-x" style={gyroX}>
           <div className="Gyro-y" style={gyroY}>
-            <div className="Gyro-fill-body">
-              <ReactSVG src="./assets/rationale/gyro-fill-body.svg" />
-            </div>
-            <div className="Gyro-fill-prop Gyro-fill-prop--top-left">
-              <ReactSVG src="./assets/rationale/gyro-fill-prop.svg" />
-            </div>
-            <div className="Gyro-fill-prop Gyro-fill-prop--top-right">
-              <ReactSVG src="./assets/rationale/gyro-fill-prop.svg" />
-            </div>
-            <div className="Gyro-fill-prop Gyro-fill-prop--bottom-left">
-              <ReactSVG src="./assets/rationale/gyro-fill-prop.svg" />
-            </div>
-            <div className="Gyro-fill-prop Gyro-fill-prop--bottom-right">
-              <ReactSVG src="./assets/rationale/gyro-fill-prop.svg" />
-            </div>
+            <div className="Gyro-pos">
+              <div className="Gyro-fill-body">
+                <ReactSVG src="./assets/rationale/gyro-fill-body.svg" />
+              </div>
+              <div className="Gyro-fill-prop Gyro-fill-prop--top-left">
+                <ReactSVG src="./assets/rationale/gyro-fill-prop.svg" />
+              </div>
+              <div className="Gyro-fill-prop Gyro-fill-prop--top-right">
+                <ReactSVG src="./assets/rationale/gyro-fill-prop.svg" />
+              </div>
+              <div className="Gyro-fill-prop Gyro-fill-prop--bottom-left">
+                <ReactSVG src="./assets/rationale/gyro-fill-prop.svg" />
+              </div>
+              <div className="Gyro-fill-prop Gyro-fill-prop--bottom-right">
+                <ReactSVG src="./assets/rationale/gyro-fill-prop.svg" />
+              </div>
 
-            <div className="Gyro-prop-connectors">
-              <ReactSVG src="./assets/rationale/gyro-prop-connectors.svg" />
-            </div>
-            <div className="Gyro-body">
-              <ReactSVG src="./assets/rationale/gyro-body.svg" />
-            </div>
-            <div className="Gyro-prop-covers">
-              <ReactSVG src="./assets/rationale/gyro-prop-covers.svg" />
+              <div className="Gyro-prop-connectors">
+                <ReactSVG src="./assets/rationale/gyro-prop-connectors.svg" />
+              </div>
+              <div className="Gyro-body">
+                <ReactSVG src="./assets/rationale/gyro-body.svg" />
+              </div>
+              <div className="Gyro-prop-covers">
+                <ReactSVG src="./assets/rationale/gyro-prop-covers.svg" />
+              </div>
             </div>
           </div>
         </div>

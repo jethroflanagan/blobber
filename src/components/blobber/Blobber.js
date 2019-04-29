@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import anime from 'animejs';
 import * as pixi from 'pixi.js'
-import { randomRange } from '../utils/random';
 import _map from 'lodash/map';
 import './Blobber.scss';
-import { getDistance, getAngle, normalizeAngle, toDegrees, getShortAngle } from '../utils/math';
+import { randomRange } from 'src/utils/random';
+import { getDistance, getAngle, normalizeAngle, toDegrees, getShortAngle } from 'src/utils/math';
 
 const TAU = Math.PI * 2;
 export class Blobber extends Component {
@@ -120,10 +120,13 @@ export class Blobber extends Component {
   generateControlPointFromCircle(circlePoint) {
     const { radius: circleRadius, numPoints } = this.properties;
     const { circleAngle, originalCircleX: circleX, originalCircleY: circleY } = circlePoint;
-    const maxLength = circleRadius / numPoints * 4;
-    const pointAngle = (circleAngle - Math.PI / 2) % TAU + randomRange(-TAU / 20, TAU / 20);
-    const lengthA = randomRange(maxLength * .2, maxLength);
-    const lengthB = randomRange(maxLength * .2, maxLength);
+    const maxLength = circleRadius / numPoints * 2.5;
+    const pointAngle = (circleAngle - Math.PI / 2) % TAU + randomRange(-TAU / 40, TAU / 40);
+    const lengthA = randomRange(maxLength * .8, maxLength);
+    const lengthB = randomRange(maxLength * .8, maxLength);
+
+    const positionRange = circleRadius / 30;
+
     return {
       ...circlePoint,
       // circleX: 0 + circleRadius * Math.cos(circleAngle),
@@ -138,8 +141,8 @@ export class Blobber extends Component {
       animatedLengthB: lengthB,
       angle: pointAngle, // tangent
       originalAngle: pointAngle, // save for reference
-      x: circleX + randomRange(1, circleRadius / 5),
-      y: circleY + randomRange(1, circleRadius / 5),
+      x: circleX + randomRange(-positionRange, positionRange),
+      y: circleY + randomRange(-positionRange, positionRange),
     }
   }
 

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import _map from 'lodash/map';
 import * as pixi from 'pixi.js'
 
-import { Blobber } from 'src/components/Blobber';
+import { Blobber } from 'src/components/blobber/Blobber';
 import './ScopePage.scss';
 
 export class ScopePage extends Component {

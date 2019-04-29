@@ -4,11 +4,12 @@ import * as pixi from 'pixi.js'
 
 import { Blobber } from 'src/components/blobber/Blobber';
 import './ScopePage.scss';
+import { Page } from '../Page';
 
-export class ScopePage extends Component {
+export class ScopePage extends Page {
   app = null;
   circles = [
-    { color: 0x500A28, radius: 290, label: 'Our world' },
+    { color: 0x500A28, radius: 310, label: 'Our world' },
     { color: 0x640032, radius: 220, label: 'Our communities' },
     { color: 0x870A3C, radius: 160, label: 'Absa as a whole' },
     { color: 0xAF144B, radius: 110, label: 'Your vertical' },
@@ -95,13 +96,13 @@ export class ScopePage extends Component {
   }
 
   componentDidMount() {
-    document.body.appendChild(this.app.view);
+    document.querySelector('.Scope').appendChild(this.app.view);
     this.createLabels();
   }
 
   render() {
     return (
-      <div className="Scope">
+      <div className="Scope Page">
         {_map(this.circles, (circle, i) => <Blobber app={this.app} color={circle.color} radius={circle.radius} x={200} y={200} key={i} onUpdated={blob => this.onUpdateBlob({ id: i, blob })}/>)}
       </div>
     );

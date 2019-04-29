@@ -1,0 +1,25 @@
+.Page {
+  display: flex;
+  position: relative;
+  background: #F05A7D;
+  height: 75%;
+  padding: 50px;
+  align-items: center;
+  justify-content: center;
+  &-image {
+    position: relative;
+    // left: 100px;
+    // top: 100px;
+    width: 297px;
+    height: 297px;
+    padding: 100px;
+  }
+  &-content {
+    width: 400px;
+    padding: 20px 50px;
+    color: #fff;
+    font-size: 20px;
+    line-height: 24px;
+    // left
+  }
+}

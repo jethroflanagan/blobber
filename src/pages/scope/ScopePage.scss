@@ -1,8 +1,16 @@
 @import 'src/styles/fonts';
 @import 'src/styles/vars';
 
-.Scope.Scope {
-  justify-content: flex-start;
+.Scope {
   background-color: #490924;
   padding: 10px;
+
+  &-content {
+    z-index: 1;
+  }
+  &-gyro {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
 }

@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import './RationalePage.scss';
-import './RationalePage.scss';
 import Gyro from './gyro/Gyro';
 import { Page } from 'src/pages/Page';
+import './RationalePage.scss';
 
 export class RationalePage extends Page {
   constructor() {

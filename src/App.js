@@ -3,6 +3,7 @@ import "./App.scss";
 import Menu from './components/menu/Menu';
 import { RationalePage } from './pages/rationale/RationalePage';
 import { ScopePage } from './pages/scope/ScopePage';
+import { Why2Page } from './pages/why2/Why2Page';
 import { pages } from './config';
 
 export class App extends Component {
@@ -13,8 +14,9 @@ export class App extends Component {
           <Menu pages={pages} />
         </aside>
         <content className="App-content">
-          <RationalePage />
-          <ScopePage />
+          {/* <RationalePage />
+          <ScopePage /> */}
+          <Why2Page />
         </content>
       </div>
     )

@@ -1,0 +1,36 @@
+@import "src/styles/vars";
+
+.List {
+  ol {
+    list-style: none;
+    counter-reset: list-counter;
+    padding-left: 0;
+  }
+  ol li {
+    counter-increment: list-counter;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+  }
+
+  ol li:before {
+    content: counter(list-counter);
+    text-align: center;
+    position: relative;
+    font-family: $font-family;
+    font-weight: 600;
+    font-size: 12px;
+    height: 20px;
+    width: 20px;
+    display: inline-flex;
+    border-radius: 20px;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid #fff;
+    margin-right: 20px;
+
+    z-index: 1;
+  }
+
+}

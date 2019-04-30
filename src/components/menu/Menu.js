@@ -21,7 +21,7 @@ export default class Menu extends Component {
     const { active } = this.state;
     return _map(this.props.pages, (page, i) => {
       return (
-        <div  onClick={e => this.setActive(i)}>
+        <div  onClick={e => this.setActive(i)} key={i}>
           <MenuItem label={page.label} key={page.label} isActive={i === active}/>
         </div>
       );

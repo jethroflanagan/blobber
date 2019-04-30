@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import anime from 'animejs';
 import * as pixi from 'pixi.js'
 import _map from 'lodash/map';
@@ -8,6 +9,24 @@ import { getDistance, getAngle, normalizeAngle, toDegrees, getShortAngle } from 
 
 const TAU = Math.PI * 2;
 export class Blobber extends Component {
+
+  static defaultProps = {
+    x: 0,
+    y: 0,
+    radius: 100,
+    color: 0xff0000,
+    onUpdated: () => {},
+  };
+  static propTypes = {
+    app: PropTypes.shape(),
+
+    // or these
+    el: PropTypes.shape(),
+    width: PropTypes.number,
+    height: PropTypes.number,
+    backgroundColor: PropTypes.number,
+  };
+
   app = null;
   containerLayer = null;
   blobLayer = null;
@@ -16,10 +35,23 @@ export class Blobber extends Component {
   properties = null;
   labelsLayer = null;
 
+
   constructor(props) {
     super();
     // TODO: move to state
     this.app = props.app;
+    if (!this.app) {
+      this.app = new pixi.Application({
+        width: props.width,
+        height: props.height,
+      });
+      this.app.background = props.backgroundColor;
+      // props.el.appendChild(this.app.view);
+    }
+  }
+
+  getCanvas() {
+    return this.app.view;
   }
 
   componentDidMount() {

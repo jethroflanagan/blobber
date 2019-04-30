@@ -5,7 +5,6 @@ export class Page extends Component {
   render() {
     return (
       <div className="Page">
-
       </div>
     )
   }

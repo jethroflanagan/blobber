@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
 import _map from 'lodash/map';
-import * as pixi from 'pixi.js'
-
+import * as pixi from 'pixi.js';
+import React from 'react';
 import { Blobber } from 'src/components/blobber/Blobber';
-import './ScopePage.scss';
 import { Page } from '../Page';
+import './ScopePage.scss';
+
 
 export class ScopePage extends Page {
   app = null;
@@ -96,14 +96,23 @@ export class ScopePage extends Page {
   }
 
   componentDidMount() {
-    document.querySelector('.Scope').appendChild(this.app.view);
+    this.refs.el.appendChild(this.app.view);
     this.createLabels();
   }
 
   render() {
     return (
-      <div className="Scope Page">
-        {_map(this.circles, (circle, i) => <Blobber app={this.app} color={circle.color} radius={circle.radius} x={200} y={200} key={i} onUpdated={blob => this.onUpdateBlob({ id: i, blob })}/>)}
+      <div className="Page Scope">
+        <div className="Scope-gyro" ref="el">
+          {_map(this.circles, (circle, i) => <Blobber app={this.app} color={circle.color} radius={circle.radius} x={200} y={200} key={i} onUpdated={blob => this.onUpdateBlob({ id: i, blob })}/>)}
+        </div>
+        <div className="Page-image">
+        </div>
+        <div className="Page-content Scope-content">
+          <p>Our future is changing at an ever-accelerating rate thanks to technology. And nowhere is this more obvious than in the <b>workplace</b>.</p>
+          <p>Across the globe business is transforming through the application of <b>technology</b>.</p>
+          <p>So where will you be in 5 years’ time?</p>
+        </div>
       </div>
     );
   }

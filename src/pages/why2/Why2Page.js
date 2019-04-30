@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Page } from '../Page';
 import './Why2Page.scss';
 import { List } from 'src/components/list/List';
+import ReactSVG from 'react-svg';
 
 export class Why2Page extends Page {
   componentDidMount() {
@@ -11,6 +12,7 @@ export class Why2Page extends Page {
     return (
       <div className="Page Why2">
         <div className="Page-image">
+          <ReactSVG src="./assets/why2/brain-placeholder.svg" />
         </div>
         <div className="Page-content">
           <p>According to the World Economic Forum there are <b>10 skills</b> that are <b>crucial to success</b> in our ever-changing digitally-driven business environment:</p>

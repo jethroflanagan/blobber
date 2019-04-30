@@ -1,6 +1,7 @@
 @import "src/styles/vars";
 
 .List {
+  position: relative;
   ol {
     list-style: none;
     counter-reset: list-counter;
@@ -27,10 +28,18 @@
     border-radius: 20px;
     justify-content: center;
     align-items: center;
-    border: 2px solid #fff;
+    border: 2px solid rgba(255,255,255, 1);
     margin-right: 20px;
 
     z-index: 1;
   }
 
+  &-blobs {
+    position: absolute;
+    left: 0;
+    top: 0;
+    &Item  {
+      position: absolute;
+    }
+  }
 }

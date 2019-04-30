@@ -4,7 +4,11 @@ import _map from 'lodash/map';
 import { Blobber } from 'src/components/blobber/Blobber';
 import "./List.scss";
 
-const BULLET_SIZE = 30;
+const BULLET_SIZE = 28;
+const BULLET_SPACING = 34;
+const BLOB_OFFSET = (BULLET_SPACING - BULLET_SIZE) / 2;
+const BLOB_IDLE_DISTORTION = .3;
+const BLOB_PADDING = BLOB_IDLE_DISTORTION * BULLET_SIZE;
 
 export class List extends Component {
   blobs = [];
@@ -22,6 +26,8 @@ export class List extends Component {
   }
 
   componentDidMount() {
+    const blobs = this.createBlobs();
+
     // const app = new pixi.Application({
     //   width: BULLET_SIZE,
     //   height: BULLET_SIZE,
@@ -34,21 +40,34 @@ export class List extends Component {
   }
 
   createBlobs() {
-    // const blobber = <Blobber radius={10} x={BULLET_SIZE/2} y={BULLET_SIZE/2} color={0xffffff} backgroundColor={0xff0000}/>
-    // this.blobs.push(blobber);
-    // return (
-    //   blobber
-    // );
+    for (let i = 0; i < this.props.children.length; i++) {
+      const width = BULLET_SIZE + BLOB_PADDING * 2;
+      const height = BULLET_SIZE + BLOB_PADDING * 2;
+      const x = width / 2;
+      const y = height / 2;
+      const radius = BULLET_SIZE / 2;
+      const blob = new Blobber({ alpha: .2, color: 0x000000, x, y, radius, idleDistortion: BLOB_IDLE_DISTORTION });
+
+      blob.createCanvas({ transparent: true, width, height });
+      // blob.createCanvas({ backgroundColor: 0x0000ff, width, height });
+
+      const container = document.createElement('div');
+      container.className = 'List-blobsItem';
+      container.style.top = `${(BULLET_SPACING) * i + 2}px`;
+      container.style.left = `${-1}px`;
+
+      blob.attachToElement(container);
+      this.refs.blobs.appendChild(container);
+    }
   }
 
   render() {
-    const blobs = this.createBlobs();
     return (
       <div className="List">
-        <ol ref="list">
+        <ol>
           {this.props.children}
         </ol>
-        {blobs}
+        <div className="List-blobs" ref="blobs" style={{ left: `-${BLOB_PADDING}px`, top: `-${BLOB_PADDING}px` }} />
       </div>
     )
   }

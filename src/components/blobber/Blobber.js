@@ -3,58 +3,61 @@ import PropTypes from 'prop-types';
 import anime from 'animejs';
 import * as pixi from 'pixi.js'
 import _map from 'lodash/map';
-import './Blobber.scss';
 import { randomRange } from 'src/utils/random';
 import { getDistance, getAngle, normalizeAngle, toDegrees, getShortAngle } from 'src/utils/math';
 
 const TAU = Math.PI * 2;
-export class Blobber extends Component {
+export class Blobber {
 
-  static defaultProps = {
-    x: 0,
-    y: 0,
-    radius: 100,
-    color: 0xff0000,
-    onUpdated: () => {},
-  };
-  static propTypes = {
-    app: PropTypes.shape(),
-
-    // or these
-    el: PropTypes.shape(),
-    width: PropTypes.number,
-    height: PropTypes.number,
-    backgroundColor: PropTypes.number,
-  };
-
+  properties = {};
   app = null;
   containerLayer = null;
   blobLayer = null;
   anchorsLayer = null;
   anchors = null;
-  properties = null;
   labelsLayer = null;
 
+  constructor({ color, x, y, radius, onUpdated, idleDistortion, alpha = 1 }) {
+    const numPoints = 4;
 
-  constructor(props) {
-    super();
-    // TODO: move to state
-    this.app = props.app;
-    if (!this.app) {
-      this.app = new pixi.Application({
-        width: props.width,
-        height: props.height,
-      });
-      this.app.background = props.backgroundColor;
-      // props.el.appendChild(this.app.view);
-    }
+    this.properties = {
+      radius,
+      x,
+      y,
+      numPoints,
+      color,
+      alpha,
+      onUpdated: onUpdated || (() => {}),
+      idleDistortion: idleDistortion || .03,
+    };
   }
 
   getCanvas() {
     return this.app.view;
   }
 
-  componentDidMount() {
+  useSharedCanvas({ app }) {
+    this.app = app;
+    this.start();
+  }
+
+  createCanvas({ width, height, backgroundColor, transparent = false }) {
+    this.app = new pixi.Application({
+      width,
+      height,
+      transparent,
+    });
+    if (backgroundColor) {
+      this.app.background = backgroundColor;
+    }
+    this.start();
+  }
+
+  attachToElement(el) {
+    el.appendChild(this.app.view);
+  }
+
+  start() {
     this.containerLayer = new pixi.Container();
     // this.labelsLayer = new pixi.Container();
     this.blobLayer = new pixi.Graphics();
@@ -67,10 +70,9 @@ export class Blobber extends Component {
 
     // this.blob.filters = [new pixi.filters.BlurFilter(this.props.radius / 10)];
     // this.blob.filters[0].blendMode = pixi.BLEND_MODES.ADD;
-    this.containerLayer.x = this.props.x;
-    this.containerLayer.y = this.props.y;
+    this.containerLayer.x = this.properties.x;
+    this.containerLayer.y = this.properties.y;
 
-    this.properties = this.createBasicProperties();
     this.anchors = this.createAnchorPoints();
     // this.showIntro();
     this.drawBlob();
@@ -111,20 +113,6 @@ export class Blobber extends Component {
     });
   }
 
-  createBasicProperties() {
-    let radius = randomRange(this.props.radius * .9, this.props.radius * 1.1);
-    let x = this.props.x;
-    let y = this.props.y;
-    const numPoints = 4;
-
-    return {
-      radius,
-      x,
-      y,
-      numPoints,
-      color: this.props.color,
-    };
-  }
 
   createAnchorPoints() {
     const anchorPoints = [];
@@ -157,7 +145,7 @@ export class Blobber extends Component {
     const lengthA = randomRange(maxLength * .8, maxLength);
     const lengthB = randomRange(maxLength * .8, maxLength);
 
-    const positionRange = circleRadius / 30;
+    const positionRange = circleRadius * this.properties.idleDistortion;
 
     return {
       ...circlePoint,
@@ -179,14 +167,14 @@ export class Blobber extends Component {
   }
 
   drawBlob() {
-    const { color } = this.properties;
+    const { color, alpha } = this.properties;
     const controlPoints = this.anchors;
     const getAnchorPoint = this.accessAnchorPoints(controlPoints);
 
     const blob = this.blobLayer;
     blob.clear();
 
-    blob.beginFill(color, 1);
+    blob.beginFill(color, alpha);
     // blob.lineStyle(2, 0xff0000, 1);
     const firstPoint = controlPoints[0];
     blob.moveTo(firstPoint.x, firstPoint.y);
@@ -315,7 +303,7 @@ export class Blobber extends Component {
   }
 
   onUpdated() {
-    this.props.onUpdated({
+    this.properties.onUpdated({
       anchors: this.anchors,
       properties: this.properties
     });
@@ -436,12 +424,5 @@ export class Blobber extends Component {
 
     }
     this.onUpdated();
-  }
-
-  render() {
-    return (
-      <div className="Blobber">
-      </div>
-    );
   }
 }

@@ -5,7 +5,7 @@ import { Blobber } from 'src/components/blobber/Blobber';
 import "./List.scss";
 
 const BULLET_SIZE = 28;
-const BULLET_SPACING = 34;
+const BULLET_SPACING = 44;
 const BLOB_OFFSET = (BULLET_SPACING - BULLET_SIZE) / 2;
 const BLOB_IDLE_DISTORTION = .3;
 const BLOB_PADDING = BLOB_IDLE_DISTORTION * BULLET_SIZE;
@@ -26,7 +26,7 @@ export class List extends Component {
   }
 
   componentDidMount() {
-    const blobs = this.createBlobs();
+    this.createBlobs();
 
     // const app = new pixi.Application({
     //   width: BULLET_SIZE,

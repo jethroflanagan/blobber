@@ -30,7 +30,6 @@ export default class Menu extends Component {
 
   render() {
     const items = this.createMenu();
-    console.log(items);
     return (
       <div className="Menu">
         <div className="Menu-logo">

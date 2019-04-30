@@ -17,9 +17,7 @@ export class Blobber {
   anchors = null;
   labelsLayer = null;
 
-  constructor({ color, x, y, radius, onUpdated, idleDistortion, alpha = 1 }) {
-    const numPoints = 4;
-
+  constructor({ color, x, y, radius, onUpdated, idleDistortion, alpha = 1, createAnchorPoints = null, numPoints = 4, setupAnchorPointAnimationTargets }) {
     this.properties = {
       radius,
       x,
@@ -29,6 +27,8 @@ export class Blobber {
       alpha,
       onUpdated: onUpdated || (() => {}),
       idleDistortion: idleDistortion || .03,
+      createAnchorPoints,
+      setupAnchorPointAnimationTargets,
     };
   }
 
@@ -47,8 +47,8 @@ export class Blobber {
       height,
       transparent,
     });
+    this.app.backgroundColor = 0xff0000;
     if (backgroundColor) {
-      this.app.background = backgroundColor;
     }
     this.start();
   }
@@ -73,13 +73,19 @@ export class Blobber {
     this.containerLayer.x = this.properties.x;
     this.containerLayer.y = this.properties.y;
 
-    this.anchors = this.createAnchorPoints();
+    if (this.properties.createAnchorPoints) {
+      this.anchors = this.properties.createAnchorPoints();
+    }
+    else {
+      this.anchors = this.createCircleAnchorPoints();
+    }
     // this.showIntro();
-    this.drawBlob();
+    // this.drawBlob();
     // this.drawAnchors();
     this.animateBlob();
     this.update();
     document.addEventListener('mousemove', e => this.onMouseMove(e));
+
   }
 
   showIntro() {
@@ -113,8 +119,7 @@ export class Blobber {
     });
   }
 
-
-  createAnchorPoints() {
+  createCircleAnchorPoints() {
     const anchorPoints = [];
     let { radius: circleRadius, numPoints } = this.properties;
     for (let i = 0; i < numPoints; i++) {
@@ -122,48 +127,63 @@ export class Blobber {
       const circleX = 0 + circleRadius * Math.cos(circleAngle);
       const circleY = 0 + circleRadius * Math.sin(circleAngle);
       anchorPoints.push(
-        this.generateControlPointFromCircle({
-          circleAngle,
-          circleX,
-          circleY,
-          // keep ref
-          originalCircleX: circleX,
-          originalCircleY: circleY,
-          neighborA: (i - 1 < 0 ? numPoints - 1 : i - 1), // index of neighbor on lengthA side
-          neighborB: (i + 1 > numPoints - 1 ? 0 : i + 1), // index of neighbor on lengthB side
+        Blobber.setupAnchorPoint({
+          anchor: {
+            circleAngle,
+            circleX,
+            circleY,
+          },
+          i,
+          properties: this.properties
         })
       );
     }
     return anchorPoints;
   }
 
-  generateControlPointFromCircle(circlePoint) {
-    const { radius: circleRadius, numPoints } = this.properties;
-    const { circleAngle, originalCircleX: circleX, originalCircleY: circleY } = circlePoint;
-    const maxLength = circleRadius / numPoints * 2.5;
-    const pointAngle = (circleAngle - Math.PI / 2) % TAU + randomRange(-TAU / 40, TAU / 40);
-    const lengthA = randomRange(maxLength * .8, maxLength);
-    const lengthB = randomRange(maxLength * .8, maxLength);
+  static setupAnchorPoint({ anchor, i, properties }) {
+    const { numPoints } = properties;
 
-    const positionRange = circleRadius * this.properties.idleDistortion;
-
+    const { circleX, circleY, lengthA, lengthB, angle } = anchor;
     return {
-      ...circlePoint,
-      // circleX: 0 + circleRadius * Math.cos(circleAngle),
-      // circleY: 0 + circleRadius * Math.sin(circleAngle),
+      ...anchor,
+      x: circleX,
+      y: circleY,
 
-      lengthA,
-      lengthB,
+      // TODO: neaten this up
+      neighborA: (i - 1 < 0 ? numPoints - 1 : i - 1), // index of neighbor on lengthA side
+      neighborB: (i + 1 > numPoints - 1 ? 0 : i + 1), // index of neighbor on lengthB side
+
+      originalCircleX: circleX,
+      originalCircleY: circleY,
       originalLengthA: lengthA,
       originalLengthB: lengthB,
+      originalAngle: angle,
+
       // used to smoothly transition between animated/interacted
       animatedLengthA: lengthA,
       animatedLengthB: lengthB,
+    }
+  }
+
+  setupAnchorPointAnimationTargets(anchor) {
+    const { radius: circleRadius, numPoints, idleDistortion } = this.properties;
+    const { circleAngle, originalCircleX: circleX, originalCircleY: circleY, originalLengthA, originalLengthB } = anchor;
+
+    const maxLength = circleRadius / numPoints * 2.5;
+    const pointAngle = (circleAngle - Math.PI / 2) % TAU + randomRange(-TAU / 40, TAU / 40);
+    const lengthA = randomRange(originalLengthA * .8, originalLengthA * 1.2);
+    const lengthB = randomRange(originalLengthB * .8, originalLengthB * 1.2);
+    const positionRange = circleRadius * idleDistortion;
+
+    return {
+      ...anchor,
       angle: pointAngle, // tangent
-      originalAngle: pointAngle, // save for reference
+      lengthA,
+      lengthB,
       x: circleX + randomRange(-positionRange, positionRange),
       y: circleY + randomRange(-positionRange, positionRange),
-    }
+    };
   }
 
   drawBlob() {
@@ -225,12 +245,12 @@ export class Blobber {
 
     for (let point of controlPoints) {
       if (point.animation) {
-        anchors.lineStyle(4, 0xffff00, 1);
+        anchors.lineStyle(2, 0xffff00, 1);
       }
       else {
-        anchors.lineStyle(4, 0x00ff00, 1);
+        anchors.lineStyle(2, 0x00ff00, 1);
       }
-      anchors.drawCircle(point.x, point.y, 3);
+      anchors.drawCircle(point.x, point.y, 2);
     }
 
     return anchors;
@@ -258,7 +278,14 @@ export class Blobber {
   }
 
   animatePoint(point, ease) {
-    const { lengthA, lengthB, angle, x, y } = this.generateControlPointFromCircle(point);
+    let animationTargets = null;
+    if (this.properties.setupAnchorPointAnimationTargets) {
+      animationTargets = this.properties.setupAnchorPointAnimationTargets();
+    }
+    else {
+      animationTargets = this.setupAnchorPointAnimationTargets(point);
+    }
+    const { lengthA, lengthB, angle, x, y } = animationTargets;
     point.animation = anime({
       lengthA,
       lengthB,
@@ -269,7 +296,6 @@ export class Blobber {
       // used to smoothly transition between animated/interacted
       circleX: x,
       circleY: y,
-
 
       targets: point,
       easing: ease || 'easeInOutCubic',
@@ -377,6 +403,8 @@ export class Blobber {
         // compare lengths to neighboring
         const neighborA = this.anchors[point.neighborA];
         const neighborB = this.anchors[point.neighborB];
+        if (!point || !neighborA)
+          debugger
         const originalDistanceA = getDistance(point.circleX, point.circleY, neighborA.circleX, neighborA.circleY);
         const originalDistanceB = getDistance(point.circleX, point.circleY, neighborB.circleX, neighborB.circleY);
         const distanceA = getDistance(target.x, target.y, neighborA.x, neighborA.y);

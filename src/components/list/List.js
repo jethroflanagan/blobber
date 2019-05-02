@@ -59,6 +59,7 @@ export class List extends Component {
       blob.attachToElement(container);
       this.refs.blobs.appendChild(container);
     }
+
   }
 
   render() {

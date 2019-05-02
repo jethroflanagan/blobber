@@ -1,91 +1,90 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import anime from 'animejs';
-import * as pixi from 'pixi.js'
-import _map from 'lodash/map';
+import * as pixi from 'pixi.js';
+import { getAngle, getDistance, getShortAngle, normalizeAngle } from 'src/utils/math';
 import { randomRange } from 'src/utils/random';
-import { getDistance, getAngle, normalizeAngle, toDegrees, getShortAngle } from 'src/utils/math';
+import _map from 'lodash/map';
 
 const TAU = Math.PI * 2;
+const noOp = noOp;
+
 export class Blobber {
+  layers = {
+    container: null,
+    blob: null,
+    anchors: null,
+  };
 
-  properties = {};
-  app = null;
-  containerLayer = null;
-  blobLayer = null;
-  anchorsLayer = null;
+  tick = {
+    updated: null,
+    wobbleAmount: null,
+    getTargets: null,
+    animationTimeRange: null,
+  };
+
+  x = null; // relative point for anchors
+  y = null; // relative point for anchors
+  color = null;
+  alpha = null;
+  isInteractive = null;
+  anchors = null
+
+  graphics = null;
   anchors = null;
-  labelsLayer = null;
 
-  constructor({ color, x, y, radius, onUpdated, idleDistortion, alpha = 1, createAnchorPoints = null, numPoints = 4, setupAnchorPointAnimationTargets }) {
-    this.properties = {
-      radius,
-      x,
-      y,
-      numPoints,
-      color,
-      alpha,
-      onUpdated: onUpdated || (() => {}),
-      idleDistortion: idleDistortion || .03,
-      createAnchorPoints,
-      setupAnchorPointAnimationTargets,
-    };
+  constructor({ color = 0xffffff, alpha = 1, x = 0, y = 0, isInteractive = false, anchors = [] }) {
+    this.color = color;
+    this.alpha = alpha;
+    this.x = x;
+    this.y = y;
+    this.isInteractive = isInteractive;
+    this.anchors = anchors;
   }
 
   getCanvas() {
-    return this.app.view;
+    return this.graphics.view;
   }
 
   useSharedCanvas({ app }) {
     this.app = app;
-    this.start();
+    this.setup();
   }
 
-  createCanvas({ width, height, backgroundColor, transparent = false }) {
-    this.app = new pixi.Application({
+  createCanvas({ width, height, backgroundColor = 0x000000, transparent = false }) {
+    this.graphics = new pixi.Application({
       width,
       height,
       transparent,
+      backgroundColor,
     });
-    this.app.backgroundColor = 0xff0000;
-    if (backgroundColor) {
-    }
-    this.start();
+    this.setup();
   }
 
   attachToElement(el) {
-    el.appendChild(this.app.view);
+    el.appendChild(this.graphics.view);
   }
 
-  start() {
-    this.containerLayer = new pixi.Container();
-    // this.labelsLayer = new pixi.Container();
-    this.blobLayer = new pixi.Graphics();
-    this.anchorsLayer = new pixi.Graphics();
+  setup() {
+    const { layers } = this;
+    layers.container = new pixi.Container();
+    layers.blob = new pixi.Graphics();
+    layers.anchors = new pixi.Graphics();
 
-    this.containerLayer.addChild(this.blobLayer);
-    this.containerLayer.addChild(this.anchorsLayer);
-    // this.containerLayer.addChild(this.labelsLayer);
-    this.app.stage.addChild(this.containerLayer);
+    layers.container.addChild(layers.blob);
+    layers.container.addChild(layers.anchors);
+    this.graphics.stage.addChild(layers.container);
 
     // this.blob.filters = [new pixi.filters.BlurFilter(this.props.radius / 10)];
     // this.blob.filters[0].blendMode = pixi.BLEND_MODES.ADD;
-    this.containerLayer.x = this.properties.x;
-    this.containerLayer.y = this.properties.y;
+    layers.container.x = this.x;
+    layers.container.y = this.y;
 
-    if (this.properties.createAnchorPoints) {
-      this.anchors = this.properties.createAnchorPoints();
-    }
-    else {
-      this.anchors = this.createCircleAnchorPoints();
-    }
     // this.showIntro();
-    // this.drawBlob();
-    // this.drawAnchors();
-    this.animateBlob();
-    this.update();
-    document.addEventListener('mousemove', e => this.onMouseMove(e));
-
+    this.drawBlob();
+    this.drawAnchors();
+    // this.animateBlob();
+    // this.update();
+    // document.addEventListener('mousemove', e => this.onMouseMove(e));
+    console.log(this.anchors);
   }
 
   showIntro() {
@@ -167,14 +166,14 @@ export class Blobber {
   }
 
   setupAnchorPointAnimationTargets(anchor) {
-    const { radius: circleRadius, numPoints, idleDistortion } = this.properties;
+    const { radius: circleRadius, numPoints, wobbleAmount } = this.properties;
     const { circleAngle, originalCircleX: circleX, originalCircleY: circleY, originalLengthA, originalLengthB } = anchor;
 
     const maxLength = circleRadius / numPoints * 2.5;
     const pointAngle = (circleAngle - Math.PI / 2) % TAU + randomRange(-TAU / 40, TAU / 40);
     const lengthA = randomRange(originalLengthA * .8, originalLengthA * 1.2);
     const lengthB = randomRange(originalLengthB * .8, originalLengthB * 1.2);
-    const positionRange = circleRadius * idleDistortion;
+    const positionRange = circleRadius * wobbleAmount;
 
     return {
       ...anchor,
@@ -187,17 +186,16 @@ export class Blobber {
   }
 
   drawBlob() {
-    const { color, alpha } = this.properties;
-    const controlPoints = this.anchors;
-    const getAnchorPoint = this.accessAnchorPoints(controlPoints);
+    const { color, alpha } = this;
+    const anchors = this.anchors;
 
-    const blob = this.blobLayer;
-    blob.clear();
+    const layer = this.layers.blob;
+    layer.clear();
 
-    blob.beginFill(color, alpha);
+    layer.beginFill(color, alpha);
     // blob.lineStyle(2, 0xff0000, 1);
-    const firstPoint = controlPoints[0];
-    blob.moveTo(firstPoint.x, firstPoint.y);
+    const firstPoint = anchors[0];
+    layer.moveTo(firstPoint.x, firstPoint.y);
 
     // draw from controlPoint A to controlPoint B using second anchor arm of A and first anchor arm of B
     // i.e. control point A -> B using a2 and b1
@@ -209,82 +207,87 @@ export class Blobber {
     //  a1        b2
     //
 
-    for (let i = 0; i < controlPoints.length; i++) {
+    for (let i = 0; i < anchors.length; i++) {
       let endIndex = i + 1;
-      if (endIndex >= controlPoints.length) {
+      if (endIndex >= anchors.length) {
         endIndex = 0;
       }
-      let endPoint = controlPoints[endIndex];
-      const anchorA = getAnchorPoint(i, 1);
-      const anchorB = getAnchorPoint(endIndex, 0);
-      blob.bezierCurveTo(
+      let endPoint = anchors[endIndex];
+      const anchorA = this.getAnchorControlPoint(i, 1);
+      const anchorB = this.getAnchorControlPoint(endIndex, 0);
+      layer.bezierCurveTo(
         anchorA.x, anchorA.y,
         anchorB.x, anchorB.y,
         endPoint.x, endPoint.y
       );
     }
-    blob.endFill();
-
-    return blob;
+    layer.endFill();
   }
 
-  // for debug
+  // TODO: remove (for debug only)
   drawAnchors() {
-    const controlPoints = this.anchors;
+    const anchors = this.anchors;
 
-    const anchors = this.anchorsLayer;
-    anchors.clear();
-    anchors.lineStyle(2, 0xffffff, .7);
-    for (let point of controlPoints) {
-      // anchors.moveTo(point.x, point.y);
-      anchors.moveTo(point.x + Math.cos(point.angle) * point.lengthA, point.y + Math.sin(point.angle) * point.lengthA);
-      // anchors.moveTo(point.x, point.y);
-      anchors.lineTo(point.x + Math.cos(point.angle + Math.PI) * point.lengthB, point.y + Math.sin(point.angle + Math.PI) * point.lengthB);
+    const layer = this.layers.anchors;
+    layer.clear();
+    layer.lineStyle(2, 0xffffff, .7);
+    for (let anchor of anchors) {
+      layer.moveTo(anchor.x + Math.cos(anchor.angle) * anchor.lengthA, anchor.y + Math.sin(anchor.angle) * anchor.lengthA);
+      layer.lineTo(anchor.x + Math.cos(anchor.angle + Math.PI) * anchor.lengthB, anchor.y + Math.sin(anchor.angle + Math.PI) * anchor.lengthB);
     }
-    // anchors.lineTo(firstPoint.x, firstPoint.y);
 
-    for (let point of controlPoints) {
+    for (let point of anchors) {
       if (point.animation) {
-        anchors.lineStyle(2, 0xffff00, 1);
+        layer.lineStyle(2, 0xffff00, 1);
       }
       else {
-        anchors.lineStyle(2, 0x00ff00, 1);
+        layer.lineStyle(2, 0x00ff00, 1);
       }
-      anchors.drawCircle(point.x, point.y, 2);
+      layer.drawCircle(point.x, point.y, 2);
     }
 
-    return anchors;
+    return layer;
   }
 
-  accessAnchorPoints() {
-    const controlPoints = this.anchors;
-
-    return (index, side) => {
-      const point = controlPoints[index];
-      const length = point['length' + (side === 0 ? 'A' : 'B')]; // lengthA or lengthB
-      const angle = point.angle + (side === 0 ? 0 : Math.PI); // add 180 if 'B'
-      return {
-        x: point.x + Math.cos(angle) * length,
-        y: point.y + Math.sin(angle) * length,
-      };
+  // get the control point on side A or B of the anchor
+  getAnchorControlPoint(index, side) {
+    const point = this.anchors[index];
+    const length = point['length' + (side === 0 ? 'A' : 'B')]; // lengthA or lengthB
+    const angle = point.angle + (side === 0 ? 0 : Math.PI); // add 180 if 'B'
+    return {
+      x: point.x + Math.cos(angle) * length,
+      y: point.y + Math.sin(angle) * length,
     };
   }
 
-  animateBlob() {
-    const controlPoints = this.anchors;
-    for (let point of controlPoints) {
+  startAnimation({
+    wobbleAmount = 10,
+    getTargets = noOp,
+    updated = noOp,
+    animationTimeRange = { min: 700, max: 2500 }
+  } = {}) {
+    this.tick.wobbleAmount = wobbleAmount;
+    this.tick.getTargets = getTargets;
+    this.tick.updated = updated;
+    this.tick.animationTimeRange = animationTimeRange;
+
+    const copyProperties = ['x', 'y', 'lengthA', 'lengthB', 'angle'];
+
+    for (let point of this.anchors) {
+      point.original = {};
+      _map(copyProperties, prop => point.original[prop] = point[prop]);
       this.animatePoint(point);
     }
   }
 
   animatePoint(point, ease) {
     let animationTargets = null;
-    if (this.properties.setupAnchorPointAnimationTargets) {
-      animationTargets = this.properties.setupAnchorPointAnimationTargets();
-    }
-    else {
+    // if (this.properties.setupAnchorPointAnimationTargets) {
+    //   animationTargets = this.properties.setupAnchorPointAnimationTargets();
+    // }
+    // else {
       animationTargets = this.setupAnchorPointAnimationTargets(point);
-    }
+    // }
     const { lengthA, lengthB, angle, x, y } = animationTargets;
     point.animation = anime({
       lengthA,
@@ -293,13 +296,14 @@ export class Blobber {
       x,
       y,
 
+      // TODO: re-add this
       // used to smoothly transition between animated/interacted
-      circleX: x,
-      circleY: y,
+      // original: { x, y },
 
       targets: point,
       easing: ease || 'easeInOutCubic',
       duration: randomRange(700, 2500),
+
       complete: () => {
         this.animatePoint(point);
       },
@@ -322,7 +326,7 @@ export class Blobber {
   update() {
     requestAnimationFrame(() => {
       this.drawBlob();
-      // this.drawAnchors();
+      this.drawAnchors();
       this.onUpdated();
       this.update();
     });

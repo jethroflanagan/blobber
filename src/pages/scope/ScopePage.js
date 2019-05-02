@@ -9,12 +9,12 @@ import './ScopePage.scss';
 export class ScopePage extends Page {
   app = null;
   circles = [
-    { color: 0x500A28, radius: 310, label: 'Our world' },
-    { color: 0x640032, radius: 220, label: 'Our communities' },
+    // { color: 0x500A28, radius: 310, label: 'Our world' },
+    // { color: 0x640032, radius: 220, label: 'Our communities' },
     { color: 0x870A3C, radius: 160, label: 'Absa as a whole' },
-    { color: 0xAF144B, radius: 110, label: 'Your vertical' },
-    { color: 0xF0325A, radius: 60, label: 'Your team' },
-    { color: 0xF05A7D, radius: 30, label: 'You' },
+    // { color: 0xAF144B, radius: 110, label: 'Your vertical' },
+    // { color: 0xF0325A, radius: 60, label: 'Your team' },
+    // { color: 0xF05A7D, radius: 30, label: 'You' },
   ];
   labels = [];
 

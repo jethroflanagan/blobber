@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import _map from 'lodash/map';
-import * as pixi from 'pixi.js'
+import * as pixi from 'pixi.js';
+import anime from 'animejs';
 
 import { Blobber } from 'src/components/Blobber';
 //import './ScopePage.scss';
@@ -15,7 +16,12 @@ export class WobblyLinePage extends Component {
   linePosY = 250;
   hitTestThreshold = 20;
   touchStart = false;
-  dragDistanceLimit = 200;
+  elasticInProgress = false;
+  dragDistanceLimit = 160;
+  controlPoint = {
+    cpX: 0,
+    cpY: 0
+  };
 
   constructor() {
     super();
@@ -29,8 +35,8 @@ export class WobblyLinePage extends Component {
     });
   }
 
-  drawLine() {
-    console.log('[drawLine]');
+  updateLine() {
+    console.log('[updateLine]');
 
   }
 
@@ -53,7 +59,7 @@ export class WobblyLinePage extends Component {
 
     document.addEventListener('mousemove', e => this.onMouseMove(e));
 
-    this.drawLine();
+    this.updateLine();
   }
 
   onMouseMove(e) {
@@ -61,69 +67,72 @@ export class WobblyLinePage extends Component {
     this.mouseY = e.pageY;
 
     this.doHitTest(e);
-    this.drawLine();
-
+    this.updateLine();
   }
 
   doHitTest(e) {
-    //console.log('[hitTest] e.pageY', e.pageY);
-
     let distY = Math.abs(this.linePosY - e.pageY);
 
-    //console.log('distance to line', distY);
-
     if (distY <= this.hitTestThreshold) {
-      console.log('Touching');
+      console.log('Hit');
       this.touchStart = true;
     }
   }
 
-  drawLine() {
-
-    // this.lineLayer.beginFill(0xDE3249);
-    // this.lineLayer.drawRect(0, 150, 500, 100);
-    // this.lineLayer.endFill();
-    let cpX = 0;
-    let cpY = 0;
-
-    this.lineLayer.clear();
-    this.lineLayer.lineStyle(5, 0xAA0000, 1);
-
-    //let cpX = this.mouseX ? this.mouseX : 0;
-    //let cpY = this.mouseY ? (this.touchStart ? this.mouseY - this.linePosY : 0) : 0;
-
+  updateLine() {
     if (this.touchStart) {
-      cpX = this.mouseX;
-      cpY = this.mouseY - this.linePosY;
+      this.controlPoint.cpX = this.mouseX;
+      this.controlPoint.cpY = this.mouseY - this.linePosY;
 
-      if (Math.abs(cpY) > this.dragDistanceLimit) {
+      if (Math.abs(this.controlPoint.cpY) > this.dragDistanceLimit) {
         console.log('Too far');
         this.touchStart = false;
+
+        if (!this.elasticInProgress) {
+          anime({
+            targets: this.controlPoint,
+            //cpX: 0,
+            cpY: 0,
+            round: 1,
+            easing: 'spring(1, 80, 10, 20)',
+            begin: () => {
+              //console.log('Anime begin');
+              this.elasticInProgress = true;
+            },
+            update: () => {
+              //console.log('Anime update');
+              this.drawLine();
+            },
+            complete: () => {
+              //console.log('Anime complete');
+              this.elasticInProgress = false;
+            }
+          });
+        }
       }
     }
 
-
     // Draw the line after all the calculations
-    this.lineLayer.bezierCurveTo(0, 0, cpX, cpY, 800, 0);
+    if (!this.elasticInProgress) {
+      this.drawLine();
+    }
 
-    // console.log('this.mouseX', this.mouseX);
-    // console.log('this.mouseY', this.mouseY);
-    // console.log('cpY', cpY);
+  }
 
+  drawLine() {
+    this.lineLayer.clear();
+    this.lineLayer.lineStyle(5, 0xAA0000, 1);
+
+    this.lineLayer.bezierCurveTo(0, 0, this.controlPoint.cpX, this.controlPoint.cpY, 800, 0);
 
     this.lineLayer.position.x = 0;
     this.lineLayer.position.y = this.linePosY;
     //this.lineLayer.closePath();
-
   }
 
   render() {
-      console.log('[render]');
-
     return (
-      <div className="Scope">
-        {/* {_map(this.circles, (circle, i) => <Blobber app={this.app} color={circle.color} radius={circle.radius} x={200} y={200} key={i} onUpdated={blob => this.onUpdateBlob({ id: i, blob })}/>)} */}
-      </div>
+      <div className="Scope"></div>
     );
   }
 }

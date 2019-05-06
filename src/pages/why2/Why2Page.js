@@ -5,7 +5,8 @@ import './Why2Page.scss';
 import { List } from 'src/components/list/List';
 import ReactSVG from 'react-svg';
 import { Blobber } from 'src/components/blobber/Blobber';
-import { getAngle, getDistance } from 'src/utils/math';
+import { getAngle, getDistance, TAU } from 'src/utils/math';
+import { randomRange } from 'src/utils/random';
 
 function resolveAnchors(anchor) {
   const { x, y, control1, control2 } = anchor;
@@ -65,46 +66,65 @@ export class Why2Page extends Page {
   }
 
   createBrainFill() {
-    const idleDistortion = 0.03;
     const width = 400; //300 * (1 + idleDistortion * 2);
     const height = 300; //244 * (1 + idleDistortion * 2);
     const x = 40;
     const y = 40;
     const blob = new Blobber({ alpha: 1, color: 0x0044cc, x, y, anchors: brainFillPoints });
-    blob.createCanvas({ backgroundColor: 0x0, width, height });
-    // blob.createCanvas({ transparent: true, width, height });
+    // blob.createCanvas({ backgroundColor: 0x0, width, height });
+    blob.createCanvas({ transparent: true, width, height });
     this.refs.brain.appendChild(blob.getCanvas());
+blob.showIntro(9000);
+return
+    blob.startAnimation({
+      wobble: {
+          position: () => ({ min: -10, max: 10 }),
+          length: (length) => ({ min: length * .8, max: length * 1.2 }),
+          angle: (angle) => ({ min: -TAU / 40, max: TAU / 40 }),
+      },
+      getTargets: ()=>{},
+      updated: ()=>{},
+      timeRange: { min: 700, max: 2500 },
+    });
   }
 
   createBlob() {
-    const idleDistortion = 0.03;
     const width = 400; //300 * (1 + idleDistortion * 2);
     const height = 300; //244 * (1 + idleDistortion * 2);
     const radius = 100;
     const offsetX = width / 2;
     const offsetY = height / 2;
 
-    const anchors = [];
-    const numPoints = 4;
-    for (let i = 0; i < numPoints; i++) {
-      const circleAngle = Math.PI * 2 * i / numPoints;
-      const x = 0 + radius * Math.cos(circleAngle);
-      const y = 0 + radius * Math.sin(circleAngle);
-      anchors.push({
-        x,
-        y,
-        angle: circleAngle - Math.PI / 2, // tangent to circle, not the normal
-        lengthA: radius  /2,
-        lengthB: radius / 2,
-      });
-    }
+    // const anchors = [];
+    // const numPoints = 4;
+    // for (let i = 0; i < numPoints; i++) {
+    //   const circleAngle = Math.PI * 2 * i / numPoints;
+    //   const x = 0 + radius * Math.cos(circleAngle);
+    //   const y = 0 + radius * Math.sin(circleAngle);
+    //   anchors.push({
+    //     x,
+    //     y,
+    //     angle: circleAngle - Math.PI / 2, // tangent to circle, not the normal
+    //     lengthA: radius  /2,
+    //     lengthB: radius / 2,
+    //   });
+    // }
 
-    const blob = new Blobber({ anchors, x: offsetX, y: offsetY, color: 0x008833 });
-    blob.createCanvas({ backgroundColor: 0x0, width, height });
-    // blob.createCanvas({ transparent: true, width, height });
+    const blob = new Blobber({ radius, x: offsetX, y: offsetY, color: 0x008833, isInteractive: false });
+    // blob.createCanvas({ backgroundColor: 0x0, width, height });
+    blob.createCanvas({ transparent: true, width, height });
     this.refs.circle.appendChild(blob.getCanvas())
 
-    // blob.startAnimation();
+    blob.startAnimation({
+        wobble: {
+            position: () => ({ min: -10, max: 10 }),
+            length: (length) => ({ min: length * .8, max: length * 1.2 }),
+            angle: (angle) => ({ min: -TAU / 40, max: TAU / 40 }),
+        },
+        getTargets: ()=>{},
+        updated: ()=>{},
+        timeRange: { min: 700, max: 2500 },
+      });
   }
 
   render() {
@@ -117,7 +137,7 @@ export class Why2Page extends Page {
           </div> */}
         </div>
         <div className="Page-content">
-          <div className="Why2-brainFill" ref="brain" style={{ left: '810px'}}/>
+          <div className="Why2-brainFill" ref="brain"/>
           <p>According to the World Economic Forum there are <b>10 skills</b> that are <b>crucial to success</b> in our ever-changing digitally-driven business environment:</p>
           {/* <List>
             <li>Complex Problem Solving</li>

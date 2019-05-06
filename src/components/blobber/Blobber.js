@@ -14,11 +14,11 @@ export class Blobber {
     anchors: null,
   };
 
-  tick = {
+  animation = {
     updated: null,
     wobbleAmount: null,
     getTargets: null,
-    animationTimeRange: null,
+    timeRange: null,
   };
 
   x = null; // relative point for anchors
@@ -31,13 +31,16 @@ export class Blobber {
   graphics = null;
   anchors = null;
 
-  constructor({ color = 0xffffff, alpha = 1, x = 0, y = 0, isInteractive = false, anchors = [] }) {
+  constructor({ color = 0xffffff, alpha = 1, x = 0, y = 0, isInteractive = false, anchors = [], radius = 0 }) {
     this.color = color;
     this.alpha = alpha;
     this.x = x;
     this.y = y;
     this.isInteractive = isInteractive;
     this.anchors = anchors;
+    if (anchors.length === 0) {
+      this.anchors = this.createCircleAnchorPoints({ radius });
+    }
   }
 
   getCanvas() {
@@ -55,6 +58,7 @@ export class Blobber {
       height,
       transparent,
       backgroundColor,
+      antialias: true,
     });
     this.setup();
   }
@@ -73,71 +77,74 @@ export class Blobber {
     layers.container.addChild(layers.anchors);
     this.graphics.stage.addChild(layers.container);
 
-    // this.blob.filters = [new pixi.filters.BlurFilter(this.props.radius / 10)];
-    // this.blob.filters[0].blendMode = pixi.BLEND_MODES.ADD;
+    this.layers.blob.filters = [new pixi.filters.BlurFilter(10)];
+    // this.layers.blob.filters[0].blendMode = pixi.BLEND_MODES.ADD;
     layers.container.x = this.x;
     layers.container.y = this.y;
 
     // this.showIntro();
     this.drawBlob();
     this.drawAnchors();
-    // this.animateBlob();
-    // this.update();
-    // document.addEventListener('mousemove', e => this.onMouseMove(e));
-    console.log(this.anchors);
+    if (this.isInteractive) {
+      // document.addEventListener('mousemove', e => this.onMouseMove(e));
+      this.graphics.view.addEventListener('mousemove', e => console.log(e));
+    }
+    // console.log(this.anchors);
   }
 
-  showIntro() {
+  showIntro(duration) {
     // first transition
-    this.anchors[0].x = 0;
-    this.anchors[0].y = 0;
-    this.anchors[0].lengthA = this.anchors[0].lengthB = 0;
-
-    this.anchors[1].x = 0;
-    this.anchors[1].y = 0;
-    this.anchors[1].lengthA = this.anchors[0].lengthB = 0;
-
-    this.anchors[2].x =  0;
-    this.anchors[2].y = 0;
-    this.anchors[2].lengthA = this.anchors[0].lengthB = 0;
-
-    this.anchors[3].x =  0;
-    this.anchors[3].y = 0;
-    this.anchors[3].lengthA = this.anchors[0].lengthB = 0;
-
-    anime({
+    for (const anchor of this.anchors) {
+      const {x, y, lengthA, lengthB } = anchor;
+      anchor.x = 0;
+      anchor.y = 0;
+      anchor.lengthA = anchor.lengthB = 0;
+      anime({
         //  = [new pixi.filters.BlurFilter(this.props.radius / 10)];
-        targets: this.blobLayer.filters[0],
-        blurX: 0,
-        blurY: 0,
-        duration: 9000 * this.properties.radius / 300,
+        targets: anchor,
+        x,
+        y,
+        lengthA,
+        lengthB,
+        duration, //: 9000 * this.properties.radius / 300,
         easing: 'cubicBezier(.5, .05, .1, .3)',
         complete: () => {
-          this.blobLayer.filters = [];
+          this.layers.blob.filters = [];
+        }
+      });
+    }
+    anime({
+        //  = [new pixi.filters.BlurFilter(this.props.radius / 10)];
+        targets: this.layers.blob.filters[0],
+        blurX: 0,
+        blurY: 0,
+        duration, //: 9000 * this.properties.radius / 300,
+        easing: 'cubicBezier(.5, .05, .1, .3)',
+        complete: () => {
+          this.layers.blob.filters = [];
         }
     });
+    this.animation.updated = ()=>{};
+    this.update();
+
   }
 
-  createCircleAnchorPoints() {
-    const anchorPoints = [];
-    let { radius: circleRadius, numPoints } = this.properties;
+  createCircleAnchorPoints({ radius }) {
+    const anchors = [];
+    const numPoints = 4;
     for (let i = 0; i < numPoints; i++) {
-      const circleAngle = TAU * i / numPoints;
-      const circleX = 0 + circleRadius * Math.cos(circleAngle);
-      const circleY = 0 + circleRadius * Math.sin(circleAngle);
-      anchorPoints.push(
-        Blobber.setupAnchorPoint({
-          anchor: {
-            circleAngle,
-            circleX,
-            circleY,
-          },
-          i,
-          properties: this.properties
-        })
-      );
+      const circleAngle = Math.PI * 2 * i / numPoints;
+      const x = 0 + radius * Math.cos(circleAngle);
+      const y = 0 + radius * Math.sin(circleAngle);
+      anchors.push({
+        x,
+        y,
+        angle: circleAngle - Math.PI / 2, // tangent to circle, not the normal
+        lengthA: radius  /2,
+        lengthB: radius / 2,
+      });
     }
-    return anchorPoints;
+    return anchors;
   }
 
   static setupAnchorPoint({ anchor, i, properties }) {
@@ -165,23 +172,32 @@ export class Blobber {
     }
   }
 
+  getWobbleAmount(property, anchor) {
+    let wobbleProperty = property;
+    if (property === 'lengthA' || property === 'lengthB') {
+      wobbleProperty = 'length';
+    }
+    const { min, max } = this.animation.wobble[wobbleProperty](anchor.original[property]);
+    return randomRange(min, max);
+  }
+
   setupAnchorPointAnimationTargets(anchor) {
-    const { radius: circleRadius, numPoints, wobbleAmount } = this.properties;
-    const { circleAngle, originalCircleX: circleX, originalCircleY: circleY, originalLengthA, originalLengthB } = anchor;
+    const { wobble } = this.animation;
+    const { original } = anchor;
 
-    const maxLength = circleRadius / numPoints * 2.5;
-    const pointAngle = (circleAngle - Math.PI / 2) % TAU + randomRange(-TAU / 40, TAU / 40);
-    const lengthA = randomRange(originalLengthA * .8, originalLengthA * 1.2);
-    const lengthB = randomRange(originalLengthB * .8, originalLengthB * 1.2);
-    const positionRange = circleRadius * wobbleAmount;
+    const pointAngle = (original.angle) % TAU + this.getWobbleAmount('angle', anchor);
+    const lengthA = this.getWobbleAmount('lengthA', anchor); // randomRange(original.lengthA * .8, original.lengthA * 1.2);
+    const lengthB = this.getWobbleAmount('lengthB', anchor); // randomRange(original.lengthB * .8, original.lengthB * 1.2);
 
+    const positionRange = this.getWobbleAmount('position', anchor);
+    const positionAngle = randomRange(0, TAU);
     return {
       ...anchor,
       angle: pointAngle, // tangent
       lengthA,
       lengthB,
-      x: circleX + randomRange(-positionRange, positionRange),
-      y: circleY + randomRange(-positionRange, positionRange),
+      x: original.x + Math.cos(positionAngle) * positionRange,
+      y: original.y + Math.sin(positionAngle) * positionRange,
     };
   }
 
@@ -261,35 +277,37 @@ export class Blobber {
   }
 
   startAnimation({
-    wobbleAmount = 10,
+    wobble = { },
     getTargets = noOp,
     updated = noOp,
-    animationTimeRange = { min: 700, max: 2500 }
+    timeRange = { min: 700, max: 2500 }
   } = {}) {
-    this.tick.wobbleAmount = wobbleAmount;
-    this.tick.getTargets = getTargets;
-    this.tick.updated = updated;
-    this.tick.animationTimeRange = animationTimeRange;
+    const { position, angle, length } = wobble;
+    this.animation.wobble = { position, angle, length };
+    this.animation.getTargets = getTargets;
+    this.animation.updated = updated;
+    this.animation.timeRange = timeRange;
 
     const copyProperties = ['x', 'y', 'lengthA', 'lengthB', 'angle'];
 
     for (let point of this.anchors) {
       point.original = {};
       _map(copyProperties, prop => point.original[prop] = point[prop]);
-      this.animatePoint(point);
+      this.animateAnchor(point);
     }
+    this.update();
   }
 
-  animatePoint(point, ease) {
+  animateAnchor(anchor, ease) {
     let animationTargets = null;
     // if (this.properties.setupAnchorPointAnimationTargets) {
     //   animationTargets = this.properties.setupAnchorPointAnimationTargets();
     // }
     // else {
-      animationTargets = this.setupAnchorPointAnimationTargets(point);
+      animationTargets = this.setupAnchorPointAnimationTargets(anchor);
     // }
     const { lengthA, lengthB, angle, x, y } = animationTargets;
-    point.animation = anime({
+    anchor.animation = anime({
       lengthA,
       lengthB,
       angle,
@@ -300,28 +318,20 @@ export class Blobber {
       // used to smoothly transition between animated/interacted
       // original: { x, y },
 
-      targets: point,
+      targets: anchor,
       easing: ease || 'easeInOutCubic',
-      duration: randomRange(700, 2500),
+      duration: randomRange(this.animation.timeRange.min, this.animation.timeRange.max),
 
       complete: () => {
-        this.animatePoint(point);
+        this.animateAnchor(anchor);
       },
       update: (animation) => {
-        // used to smoothly transition between animated/interacted
-        point.animatedLengthA = point.lengthA;
-        point.animatedLengthB = point.lengthB;
-        if (point.label) {
-          this.updateLabel({ label: point.label, point });
-        }
+        // TODO: used to smoothly transition between animated/interacted
+        // anchor.animatedLengthA = anchor.lengthA;
+        // anchor.animatedLengthB = anchor.lengthB;
       }
     });
   }
-
-  // updateLabel({ label, point }) {
-  //   label.x = point.x - point.label.width / 2;
-  //   label.y = point.y - point.label.height - 10;
-  // }
 
   update() {
     requestAnimationFrame(() => {
@@ -333,15 +343,16 @@ export class Blobber {
   }
 
   onUpdated() {
-    this.properties.onUpdated({
+    this.animation.updated({
       anchors: this.anchors,
       properties: this.properties
     });
   }
 
   onMouseMove(e) {
-    const { x, y, radius } = this.properties;
-    const MAX_DISTANCE = radius * 1.5;
+    const { x, y } = this;
+    console.log(this.graphics.view);
+    const MAX_DISTANCE = 150;
     const position = {x: e.pageX - x, y: e.pageY - y};
     for (const point of this.anchors) {
       const distance = getDistance(point.circleX, point.circleY, position.x, position.y);
@@ -439,7 +450,7 @@ export class Blobber {
       }
       else {
         if (!point.animation) {
-          this.animatePoint(point);
+          this.animateAnchor(point);
         }
       }
 

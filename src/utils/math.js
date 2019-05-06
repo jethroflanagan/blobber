@@ -1,3 +1,5 @@
+export const PI = Math.PI;
+export const TAU = Math.PI * 2;
 export const getDistance = (x1, y1, x2, y2) => Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
 
 export const getAngle = (x1, y1, x2, y2) => Math.atan2(y2 - y1, x2 - x1);

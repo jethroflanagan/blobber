@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="219px" height="132px" viewBox="0 0 219 132" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 54.1 (76490) - https://sketchapp.com -->
+    <title>proc-step marker copy</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="FDO-site-2" transform="translate(-342.000000, -3991.000000)">
+            <g id="proc-step-1" transform="translate(342.000000, 3991.000000)">
+                <text id="Empathise" font-family="Helvetica" font-size="20" font-weight="normal" line-spacing="24" fill="#FFFFFF">
+                    <tspan x="162" y="85">Define</tspan>
+                </text>
+                <text id="STEP-1" font-family="Helvetica" font-size="16" font-weight="normal" line-spacing="24" fill="#FFFFFF">
+                    <tspan x="162" y="57">Step 2</tspan>
+                </text>
+                <g id="proc_step_diagram" transform="translate(0.000000, 0.000000)" stroke="#FFFFFF">
+                    <g id="proc_blank" transform="translate(0.000000, 47.000000)" stroke-width="2">
+                        <rect id="Rectangle" x="1" y="1" width="35" height="35" rx="17.5"></rect>
+                    </g>
+                    <g id="proc_blank" transform="translate(47.000000, 95.000000)" stroke-width="2">
+                        <rect id="Rectangle" x="1" y="1" width="35" height="35" rx="17.5"></rect>
+                    </g>
+                    <g id="proc_current" transform="translate(95.000000, 47.000000)" stroke-width="2">
+                        <rect id="Rectangle" fill="#FFFFFF" fill-rule="evenodd" x="6" y="6" width="25" height="25" rx="12.5"></rect>
+                        <rect id="Rectangle" x="1" y="1" width="35" height="35" rx="17.5"></rect>
+                    </g>
+                    <g id="proc_tick" transform="translate(47.000000, 0.000000)">
+                        <g id="Group-2-Copy" stroke-width="1" fill-rule="evenodd" transform="translate(15.000000, 16.000000)" stroke-linecap="round">
+                            <polyline id="Path-3" stroke-width="2" points="0 3.72222222 2.5 5.5 7 0.5"></polyline>
+                        </g>
+                        <rect id="Rectangle" stroke-width="2" x="1" y="1" width="35" height="35" rx="17.5"></rect>
+                        <rect id="Rectangle" stroke-width="2" x="6.5" y="6.5" width="24" height="24" rx="12"></rect>
+                    </g>
+                    <path d="M43.5780137,24.5775626 C35,29 29,35 24.5780137,43.5775626" id="Path-2" stroke-width="2" stroke-linecap="round" stroke-dasharray="4"></path>
+                    <path d="M43.5780137,87 C35,91.4224374 29,97.4224374 24.5780137,106" id="Path-2-Copy-2" stroke-width="2" stroke-linecap="round" stroke-dasharray="4" transform="translate(34.078014, 96.500000) scale(1, -1) translate(-34.078014, -96.500000) "></path>
+                    <path d="M106,24.5775626 C97.4219863,29 91.4219863,35 87,43.5775626" id="Path-2-Copy" stroke-width="2" stroke-linecap="round" stroke-dasharray="4" transform="translate(96.500000, 34.077563) scale(-1, 1) translate(-96.500000, -34.077563) "></path>
+                    <path d="M106,87 C97.4219863,91.4224374 91.4219863,97.4224374 87,106" id="Path-2-Copy-3" stroke-width="2" stroke-linecap="round" stroke-dasharray="4" transform="translate(96.500000, 96.500000) scale(-1, -1) translate(-96.500000, -96.500000) "></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

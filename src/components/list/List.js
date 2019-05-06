@@ -46,26 +46,45 @@ export class List extends Component {
       const x = width / 2;
       const y = height / 2;
       const radius = BULLET_SIZE / 2;
-      const blob = new Blobber({ alpha: .2, color: 0x000000, x, y, radius, idleDistortion: BLOB_IDLE_DISTORTION });
+      const blob = new Blobber({ alpha: .4, color: 0xffffff, x, y, radius, idleDistortion: BLOB_IDLE_DISTORTION });
 
       blob.createCanvas({ transparent: true, width, height });
-      // blob.createCanvas({ backgroundColor: 0x0000ff, width, height });
 
       const container = document.createElement('div');
       container.className = 'List-blobsItem';
-      container.style.top = `${(BULLET_SPACING) * i + 2}px`;
-      container.style.left = `${-1}px`;
+      container.style.top = `${(BULLET_SPACING) * i - 1}px`;
+      container.style.left = `${-4}px`;
 
       blob.attachToElement(container);
       this.refs.blobs.appendChild(container);
+
+      blob.startWobbling({
+        wobble: {
+            position: () => ({ min: -3, max: 3 }),
+            length: (length) => ({ min: length * .8, max: length * 1.2 }),
+            angle: (angle) => ({ min: -Math.PI / 20, max: Math.PI / 20 }),
+        },
+        getTargets: ()=>{},
+        updated: ()=>{},
+        timeRange: { min: 1700, max: 3500 },
+      });
     }
 
   }
 
   render() {
+    const { color } = this.props;
     return (
       <div className="List">
-        <ol>
+        {/* <style dangerouslySetInnerHTML={{
+          __html: [
+            '.List ol li:before {',
+            `  color: ${color}`,
+            '}'
+            ].join('\n')
+          }}>
+        </style> */}
+        <ol ref="list">
           {this.props.children}
         </ol>
         <div className="List-blobs" ref="blobs" style={{ left: `-${BLOB_PADDING}px`, top: `-${BLOB_PADDING}px` }} />

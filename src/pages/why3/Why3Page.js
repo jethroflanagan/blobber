@@ -1,13 +1,10 @@
-import React, { Component } from 'react'
-import { Page } from '../Page';
-import _map from 'lodash/map';
-import './Why2Page.scss';
-import { List } from 'src/components/list/List';
+import React from 'react';
 import ReactSVG from 'react-svg';
 import { Blobber, resolveAnchors } from 'src/components/blobber/Blobber';
-import { getAngle, getDistance, TAU } from 'src/utils/math';
-import { randomRange } from 'src/utils/random';
-import * as pixi from 'pixi.js';
+import { TAU } from 'src/utils/math';
+import { Page } from '../Page';
+import './Why3Page.scss';
+
 
 const brainFillPoints = [
   {
@@ -48,7 +45,7 @@ const brainFillPoints = [
   },
 ].map(resolveAnchors);
 
-export class Why2Page extends Page {
+export class Why3Page extends Page {
   componentDidMount() {
     this.createBrainFill();
   }
@@ -75,27 +72,19 @@ export class Why2Page extends Page {
 
   render() {
     return (
-      <div className="Page Why2">
+      <div className="Page Why3">
         <div className="Page-image">
-          <div className="Why2-brainFill" ref="brain"/>
-          <div className="Why2-brainOutline">
-            <ReactSVG src="./assets/why/brain-placeholder.svg" />
+          <div className="Why3-brainFill" ref="brain"/>
+          <div className="Why3-brainOutline">
+            <ReactSVG src="./assets/why/brain-symbols-placeholder.svg" />
           </div>
         </div>
         <div className="Page-content">
-          <p>According to the World Economic Forum there are <b>10 skills</b> that are <b>crucial to success</b> in our ever-changing digitally-driven business environment:</p>
-          <List color="#f0315a">
-            <li>Complex Problem Solving</li>
-            <li>Critical Thinking</li>
-            <li>Creativity</li>
-            <li>People Management</li>
-            <li>Co-ordination with others</li>
-            <li>Emotional Intelligence - Empathy</li>
-            <li>Judgement and Decisions</li>
-            <li>Service orientation</li>
-            <li>Negotiations</li>
-            <li>Cognitive Flexibility</li>
-          </List>
+          <p><b>Design Thinking is your pathway to learning and acquiring these skills.</b></p>
+
+          <p>It’s the way we will all do business in the future and it’s the quickest way to demonstrating real value and success.</p>
+
+          <p>Let’s get started.</p>
         </div>
       </div>
     )

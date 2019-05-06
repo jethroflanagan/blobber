@@ -72,26 +72,26 @@ export default class Gyro extends Component {
                 <ReactSVG src="./assets/rationale/gyro-fill-body.svg" />
               </div>
               <div className="Gyro-fill-prop Gyro-fill-prop--top-left">
-                <ReactSVG src="./assets/rationale/gyro-fill-prop.svg" />
+                <ReactSVG src="./assets/gyro/gyro-fill-prop.svg" />
               </div>
               <div className="Gyro-fill-prop Gyro-fill-prop--top-right">
-                <ReactSVG src="./assets/rationale/gyro-fill-prop.svg" />
+                <ReactSVG src="./assets/gyro/gyro-fill-prop.svg" />
               </div>
               <div className="Gyro-fill-prop Gyro-fill-prop--bottom-left">
-                <ReactSVG src="./assets/rationale/gyro-fill-prop.svg" />
+                <ReactSVG src="./assets/gyro/gyro-fill-prop.svg" />
               </div>
               <div className="Gyro-fill-prop Gyro-fill-prop--bottom-right">
-                <ReactSVG src="./assets/rationale/gyro-fill-prop.svg" />
+                <ReactSVG src="./assets/gyro/gyro-fill-prop.svg" />
               </div>
 
               <div className="Gyro-prop-connectors">
-                <ReactSVG src="./assets/rationale/gyro-prop-connectors.svg" />
+                <ReactSVG src="./assets/gyro/gyro-prop-connectors.svg" />
               </div>
               <div className="Gyro-body">
-                <ReactSVG src="./assets/rationale/gyro-body.svg" />
+                <ReactSVG src="./assets/gyro/gyro-body.svg" />
               </div>
               <div className="Gyro-prop-covers">
-                <ReactSVG src="./assets/rationale/gyro-prop-covers.svg" />
+                <ReactSVG src="./assets/gyro/gyro-prop-covers.svg" />
               </div>
             </div>
           </div>

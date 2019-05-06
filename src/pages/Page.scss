@@ -20,4 +20,19 @@
     font-size: 20px;
     line-height: 24px;
   }
+  &-lead {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0;
+  }
+  &-title {
+    margin-top: 0;
+    font-weight: bold;
+  }
+  p {
+    margin-top: 0;
+  }
+  &-columns {
+    column-count: 2;
+  }
 }

@@ -1,23 +1,22 @@
 import React, { Component } from 'react';
-import _map from 'lodash/map';
 import * as pixi from 'pixi.js';
 import anime from 'animejs';
 
-import { Blobber } from 'src/components/Blobber';
-//import './ScopePage.scss';
-
 export class WobblyLinePage extends Component {
   app = null;
+  shapeWidth = 800;
+  shapeHeight = 500;
+  shapeOffsetY = 300;
   lineLayer = null;
   containerLayer = null;
   mouseX = null;
   mouseY = null;
+  lineBounceAnimation = null;
   hitTest = false;
-  linePosY = 250;
   hitTestThreshold = 20;
   touchStart = false;
   elasticInProgress = false;
-  dragDistanceLimit = 160;
+  dragDistanceLimit = 120;
   controlPoint = {
     cpX: 0,
     cpY: 0
@@ -35,23 +34,12 @@ export class WobblyLinePage extends Component {
     });
   }
 
-  updateLine() {
-    console.log('[updateLine]');
-
-  }
-
-  update() {
-      console.log('[update]');
-
-  }
-
   componentDidMount() {
     console.log('[componentDidMount]');
 
     document.body.appendChild(this.app.view);
 
     this.containerLayer = new pixi.Container();
-    // this.labelsLayer = new pixi.Container();
     this.lineLayer = new pixi.Graphics();
 
     this.containerLayer.addChild(this.lineLayer);
@@ -71,25 +59,29 @@ export class WobblyLinePage extends Component {
   }
 
   doHitTest(e) {
-    let distY = Math.abs(this.linePosY - e.pageY);
+    const distY = Math.abs(this.shapeOffsetY - e.pageY);
 
     if (distY <= this.hitTestThreshold) {
-      console.log('Hit');
       this.touchStart = true;
+
+      if (this.lineBounceAnimation) {
+        this.lineBounceAnimation.pause();
+        this.elasticInProgress = false;
+      }
     }
   }
 
   updateLine() {
     if (this.touchStart) {
       this.controlPoint.cpX = this.mouseX;
-      this.controlPoint.cpY = this.mouseY - this.linePosY;
+      this.controlPoint.cpY = this.mouseY - this.shapeOffsetY;
 
+      // Check if the line has been dragged past the limit
       if (Math.abs(this.controlPoint.cpY) > this.dragDistanceLimit) {
-        console.log('Too far');
         this.touchStart = false;
 
         if (!this.elasticInProgress) {
-          anime({
+          this.lineBounceAnimation = anime({
             targets: this.controlPoint,
             //cpX: 0,
             cpY: 0,
@@ -100,11 +92,9 @@ export class WobblyLinePage extends Component {
               this.elasticInProgress = true;
             },
             update: () => {
-              //console.log('Anime update');
               this.drawLine();
             },
             complete: () => {
-              //console.log('Anime complete');
               this.elasticInProgress = false;
             }
           });
@@ -116,18 +106,22 @@ export class WobblyLinePage extends Component {
     if (!this.elasticInProgress) {
       this.drawLine();
     }
-
   }
 
   drawLine() {
     this.lineLayer.clear();
+    this.lineLayer.beginFill(0xAA0000);
     this.lineLayer.lineStyle(5, 0xAA0000, 1);
 
-    this.lineLayer.bezierCurveTo(0, 0, this.controlPoint.cpX, this.controlPoint.cpY, 800, 0);
+    this.lineLayer.bezierCurveTo(0, 0, this.controlPoint.cpX, this.controlPoint.cpY, this.shapeWidth, 0);
+    this.lineLayer.lineTo(this.shapeWidth, this.shapeHeight);
+    this.lineLayer.lineTo(0, this.shapeHeight);
+    this.lineLayer.closePath();
+    this.lineLayer.endFill();
 
     this.lineLayer.position.x = 0;
-    this.lineLayer.position.y = this.linePosY;
-    //this.lineLayer.closePath();
+    this.lineLayer.position.y = this.shapeOffsetY;
+    //
   }
 
   render() {

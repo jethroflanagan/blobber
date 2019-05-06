@@ -1,21 +1,20 @@
 // w=297, h=297
 .Gyro {
+  $intro-time: 3s;
+  $lift-height: 30px;
+  // $intro-time: 4s;
   position: relative;
-  // width: 297px;
-  // height: 297px;
+  width: 297px;
+  height: 297px;
 
   transform-style: preserve-3d;
   transform-origin: center;
   perspective-origin: center center;
-  animation: gyro-container 3s ease-in-out alternate infinite;
-  &--intro {
-    animation: none;
-  }
 
-  &-x, &-y {
+  &-x, &-y, &-pos {
     transform-style: preserve-3d;
     transform-origin: center;
-    // perspective: 1000px;
+    perspective: 800px;
     perspective-origin: center center;
     transition: transform .3s ease-out;
     width: 297px;
@@ -27,20 +26,28 @@
   &-y {
     transform: rotate3d(1, 0, 0, 0);
     .Gyro--intro & {
-      // transform: rotate3d(1, 0, 0, 50deg);
-      animation: gyro-intro-container 3s ease-in-out forwards 1;
+      animation: gyro-intro-container 4s ease-in-out forwards 1;
       animation-delay: 1s;
     }
   }
+  &-pos {
+    animation: gyro-float 2s ease-in-out alternate infinite;
+    .Gyro--intro & {
+      animation: gyro-lift 1s ease-out forwards 1;
+      animation-delay: 3s;
+    }
+  }
+
   &-body {
     position: absolute;
     left: 77px;
     top: 77px;
     transform: translate3d(0, 0, 50px);
     .Gyro--intro & {
+      $delay: 2s;
       transform: translate3d(0,0,0);
       animation: gyro-intro-body 1s ease-out forwards;
-      animation-delay: 2s;
+      animation-delay: $delay;
     }
   }
   &-prop-connectors {
@@ -60,7 +67,7 @@
     .Gyro--intro & {
       transform: translate3d(0,0,0);
       animation: gyro-intro-prop-covers 1s ease-out forwards;
-      animation-delay: 2s;
+      animation-delay: 3s;
     }
   }
 
@@ -78,11 +85,10 @@
 
   &-fill-prop {
     position: absolute;
-    transform: translate3d(0, 0, 0);
-    animation: gyro-prop-spin 1s linear forwards infinite;
+    transform: translate3d(0, 0, -1px);
+    animation: gyro-prop-spin .6s linear forwards infinite;
     .Gyro--intro & {
-      animation: none;
-      animation: gyro-prop-spin 1s ease-in forwards 1;
+      animation: gyro-intro-prop-spin 2s linear forwards 1;
       animation-delay: 3s;
     }
 
@@ -110,6 +116,20 @@
     }
     100% {
       transform: rotate(360deg) translate3d(0, 0, 0);
+    }
+  }
+  @keyframes gyro-intro-prop-spin {
+    0% {
+      transform: rotate(0) translate3d(0, 0, 0);
+    }
+    33% {
+      transform: rotate(360deg) translate3d(0, 0, 0);
+    }
+    66% {
+      transform: rotate(720deg) translate3d(0, 0, 0);
+    }
+    100% {
+      transform: rotate(1080deg) translate3d(0, 0, 0);
     }
   }
 
@@ -156,15 +176,24 @@
       transform: rotate3d(1, 0, 0, 50deg);
     }
     100% {
+      // transform: rotate3d(1, 0, 0, 50deg);
       transform: rotate3d(1, 0, 0, 0);
     }
   }
-  @keyframes gyro-container {
+  @keyframes gyro-float {
+    0% {
+      transform: translate3d(0, 0, $lift-height);
+    }
+    100% {
+      transform: translate3d(0, 0, #{$lift-height / 2});
+    }
+  }
+  @keyframes gyro-lift {
     0% {
       transform: translate3d(0, 0, 0);
     }
     100% {
-      transform: translate3d(0, 0, 300px);
+      transform: translate3d(0, 0, $lift-height);
     }
   }
 

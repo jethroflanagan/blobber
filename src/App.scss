@@ -1,0 +1,14 @@
+.App {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  height: 100vh;
+  &-menu {
+    flex: 240px 0 0;
+  }
+  &-content {
+    flex: 1 1;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+}

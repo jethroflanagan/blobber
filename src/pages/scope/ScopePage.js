@@ -1,19 +1,20 @@
-import React, { Component } from 'react';
 import _map from 'lodash/map';
-import * as pixi from 'pixi.js'
-
-import { Blobber } from 'src/components/Blobber';
+import * as pixi from 'pixi.js';
+import React from 'react';
+import { Blobber } from 'src/components/blobber/Blobber';
+import { Page } from '../Page';
 import './ScopePage.scss';
 
-export class ScopePage extends Component {
+
+export class ScopePage extends Page {
   app = null;
   circles = [
-    { color: 0x500A28, radius: 290, label: 'Our world' },
-    { color: 0x640032, radius: 220, label: 'Our communities' },
+    // { color: 0x500A28, radius: 310, label: 'Our world' },
+    // { color: 0x640032, radius: 220, label: 'Our communities' },
     { color: 0x870A3C, radius: 160, label: 'Absa as a whole' },
-    { color: 0xAF144B, radius: 110, label: 'Your vertical' },
-    { color: 0xF0325A, radius: 60, label: 'Your team' },
-    { color: 0xF05A7D, radius: 30, label: 'You' },
+    // { color: 0xAF144B, radius: 110, label: 'Your vertical' },
+    // { color: 0xF0325A, radius: 60, label: 'Your team' },
+    // { color: 0xF05A7D, radius: 30, label: 'You' },
   ];
   labels = [];
 
@@ -95,14 +96,23 @@ export class ScopePage extends Component {
   }
 
   componentDidMount() {
-    document.body.appendChild(this.app.view);
+    this.refs.el.appendChild(this.app.view);
     this.createLabels();
   }
 
   render() {
     return (
-      <div className="Scope">
-        {_map(this.circles, (circle, i) => <Blobber app={this.app} color={circle.color} radius={circle.radius} x={200} y={200} key={i} onUpdated={blob => this.onUpdateBlob({ id: i, blob })}/>)}
+      <div className="Page Scope">
+        <div className="Scope-gyro" ref="el">
+          {_map(this.circles, (circle, i) => <Blobber app={this.app} color={circle.color} radius={circle.radius} x={200} y={200} key={i} onUpdated={blob => this.onUpdateBlob({ id: i, blob })}/>)}
+        </div>
+        <div className="Page-image">
+        </div>
+        <div className="Page-content Scope-content">
+          <p>Our future is changing at an ever-accelerating rate thanks to technology. And nowhere is this more obvious than in the <b>workplace</b>.</p>
+          <p>Across the globe business is transforming through the application of <b>technology</b>.</p>
+          <p>So where will you be in 5 years’ time?</p>
+        </div>
       </div>
     );
   }

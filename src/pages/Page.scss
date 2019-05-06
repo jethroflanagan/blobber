@@ -1,0 +1,23 @@
+.Page {
+  display: flex;
+  position: relative;
+  background: #F05A7D;
+  height: 75%;
+  padding: 50px;
+  align-items: center;
+  justify-content: center;
+
+  &-image {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    padding: 100px;
+  }
+  &-content {
+    width: 400px;
+    padding: 20px 50px;
+    color: #fff;
+    font-size: 20px;
+    line-height: 24px;
+  }
+}

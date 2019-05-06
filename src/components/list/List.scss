@@ -1,0 +1,45 @@
+@import "src/styles/vars";
+
+.List {
+  position: relative;
+  ol {
+    list-style: none;
+    counter-reset: list-counter;
+    padding-left: 0;
+  }
+  ol li {
+    counter-increment: list-counter;
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  ol li:before {
+    content: counter(list-counter);
+    text-align: center;
+    position: relative;
+    font-family: $font-family;
+    font-weight: 600;
+    font-size: 12px;
+    height: 20px;
+    width: 20px;
+    display: inline-flex;
+    border-radius: 20px;
+    justify-content: center;
+    align-items: center;
+    // border: 2px solid rgba(255,255,255, 1);
+    margin-right: 30px;
+
+    z-index: 1;
+  }
+
+  &-blobs {
+    position: absolute;
+    left: 0;
+    top: 0;
+    &Item  {
+      position: absolute;
+    }
+  }
+}

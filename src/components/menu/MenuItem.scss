@@ -1,0 +1,38 @@
+@import "src/styles/vars";
+
+.MenuItem {
+  $tween: .3s ease-out;
+  $color-base: #9A9595;
+  display: flex;
+  height: 56px;
+  align-items: center;
+  cursor: pointer;
+
+  &-label {
+    font-family: $font-family;
+    font-size: 16px;
+    color: #9A9595;
+    transition: color $tween;
+  }
+  &--active &-label {
+    color: $color-focus;
+  }
+
+  &-line {
+    margin-right: 48px;
+    height: 2px;
+    width: 8px;
+    background: $color-base;
+    transition: margin $tween, width $tween;
+  }
+  &:hover &-line {
+    margin-right: 30px;
+    width: 26px;
+    background: $color-focus;
+  }
+  &--active &-line {
+    margin-right: 30px;
+    width: 26px;
+    background: $color-focus;
+  }
+}

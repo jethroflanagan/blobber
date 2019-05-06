@@ -1,0 +1,16 @@
+@import "src/styles/vars";
+
+.Menu {
+  background: #2D2323;
+  height: 100%;
+
+  &-logo {
+    height: 224px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &-items {
+  }
+}

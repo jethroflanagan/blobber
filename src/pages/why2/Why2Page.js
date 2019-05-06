@@ -7,6 +7,7 @@ import ReactSVG from 'react-svg';
 import { Blobber } from 'src/components/blobber/Blobber';
 import { getAngle, getDistance, TAU } from 'src/utils/math';
 import { randomRange } from 'src/utils/random';
+import * as pixi from 'pixi.js';
 
 function resolveAnchors(anchor) {
   const { x, y, control1, control2 } = anchor;
@@ -61,7 +62,18 @@ const brainFillPoints = [
 
 export class Why2Page extends Page {
   componentDidMount() {
+
+    // this.circleBlobApp = new pixi.Application({
+    //   width: 300,
+    //   height: 300,
+    //   transparent: true,
+    //   antialias: true,
+    // });
+
+    // this.createBlob();
+    // this.createBlob();
     this.createBlob();
+
     this.createBrainFill();
   }
 
@@ -74,9 +86,9 @@ export class Why2Page extends Page {
     // blob.createCanvas({ backgroundColor: 0x0, width, height });
     blob.createCanvas({ transparent: true, width, height });
     this.refs.brain.appendChild(blob.getCanvas());
-blob.showIntro(9000);
-return
-    blob.startAnimation({
+    // blob.showIntro(9000);
+    // return
+    blob.startWobbling({
       wobble: {
           position: () => ({ min: -10, max: 10 }),
           length: (length) => ({ min: length * .8, max: length * 1.2 }),
@@ -95,27 +107,13 @@ return
     const offsetX = width / 2;
     const offsetY = height / 2;
 
-    // const anchors = [];
-    // const numPoints = 4;
-    // for (let i = 0; i < numPoints; i++) {
-    //   const circleAngle = Math.PI * 2 * i / numPoints;
-    //   const x = 0 + radius * Math.cos(circleAngle);
-    //   const y = 0 + radius * Math.sin(circleAngle);
-    //   anchors.push({
-    //     x,
-    //     y,
-    //     angle: circleAngle - Math.PI / 2, // tangent to circle, not the normal
-    //     lengthA: radius  /2,
-    //     lengthB: radius / 2,
-    //   });
-    // }
-
     const blob = new Blobber({ radius, x: offsetX, y: offsetY, color: 0x008833, isInteractive: false });
     // blob.createCanvas({ backgroundColor: 0x0, width, height });
     blob.createCanvas({ transparent: true, width, height });
+    // blob.useSharedCanvas({ app: this.circleBlobApp });
     this.refs.circle.appendChild(blob.getCanvas())
 
-    blob.startAnimation({
+    blob.startWobbling({
         wobble: {
             position: () => ({ min: -10, max: 10 }),
             length: (length) => ({ min: length * .8, max: length * 1.2 }),

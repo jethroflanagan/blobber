@@ -3,6 +3,7 @@ import * as pixi from 'pixi.js';
 import { getAngle, getDistance, getShortAngle, normalizeAngle } from 'src/utils/math';
 import { randomRange } from 'src/utils/random';
 import _map from 'lodash/map';
+import _cloneDeep from 'lodash/cloneDeep';
 
 const TAU = Math.PI * 2;
 const noOp = noOp;
@@ -31,13 +32,17 @@ export class Blobber {
   graphics = null;
   anchors = null;
 
-  constructor({ color = 0xffffff, alpha = 1, x = 0, y = 0, isInteractive = false, anchors = [], radius = 0 }) {
+  // TODO: remove
+  isDebug = false;
+
+  constructor({ color = 0xffffff, alpha = 1, x = 0, y = 0, isInteractive = false, anchors = [], radius = 0, isDebug = false }) {
     this.color = color;
     this.alpha = alpha;
     this.x = x;
     this.y = y;
     this.isInteractive = isInteractive;
-    this.anchors = anchors;
+    this.anchors = _cloneDeep(anchors);
+    this.isDebug = isDebug;
     if (anchors.length === 0) {
       this.anchors = this.createCircleAnchorPoints({ radius });
     }
@@ -48,7 +53,7 @@ export class Blobber {
   }
 
   useSharedCanvas({ app }) {
-    this.app = app;
+    this.graphics = app;
     this.setup();
   }
 
@@ -77,14 +82,13 @@ export class Blobber {
     layers.container.addChild(layers.anchors);
     this.graphics.stage.addChild(layers.container);
 
-    this.layers.blob.filters = [new pixi.filters.BlurFilter(10)];
+    // this.layers.blob.filters = [new pixi.filters.AlphaFilter(1)];
     // this.layers.blob.filters[0].blendMode = pixi.BLEND_MODES.ADD;
     layers.container.x = this.x;
     layers.container.y = this.y;
 
     // this.showIntro();
     this.drawBlob();
-    this.drawAnchors();
     if (this.isInteractive) {
       // document.addEventListener('mousemove', e => this.onMouseMove(e));
       this.graphics.view.addEventListener('mousemove', e => console.log(e));
@@ -145,31 +149,6 @@ export class Blobber {
       });
     }
     return anchors;
-  }
-
-  static setupAnchorPoint({ anchor, i, properties }) {
-    const { numPoints } = properties;
-
-    const { circleX, circleY, lengthA, lengthB, angle } = anchor;
-    return {
-      ...anchor,
-      x: circleX,
-      y: circleY,
-
-      // TODO: neaten this up
-      neighborA: (i - 1 < 0 ? numPoints - 1 : i - 1), // index of neighbor on lengthA side
-      neighborB: (i + 1 > numPoints - 1 ? 0 : i + 1), // index of neighbor on lengthB side
-
-      originalCircleX: circleX,
-      originalCircleY: circleY,
-      originalLengthA: lengthA,
-      originalLengthB: lengthB,
-      originalAngle: angle,
-
-      // used to smoothly transition between animated/interacted
-      animatedLengthA: lengthA,
-      animatedLengthB: lengthB,
-    }
   }
 
   getWobbleAmount(property, anchor) {
@@ -238,10 +217,13 @@ export class Blobber {
       );
     }
     layer.endFill();
+
+    this.drawAnchors();
   }
 
   // TODO: remove (for debug only)
   drawAnchors() {
+    if (!this.isDebug) return;
     const anchors = this.anchors;
 
     const layer = this.layers.anchors;
@@ -276,7 +258,7 @@ export class Blobber {
     };
   }
 
-  startAnimation({
+  startWobbling({
     wobble = { },
     getTargets = noOp,
     updated = noOp,
@@ -336,7 +318,6 @@ export class Blobber {
   update() {
     requestAnimationFrame(() => {
       this.drawBlob();
-      this.drawAnchors();
       this.onUpdated();
       this.update();
     });

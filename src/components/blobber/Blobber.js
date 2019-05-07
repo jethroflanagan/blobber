@@ -53,7 +53,7 @@ export class Blobber {
     this.x = x;
     this.y = y;
     this.isInteractive = isInteractive;
-    this.anchors = _cloneDeep(anchors);
+    this.anchors = _cloneDeep(anchors); // dereference
     this.isDebug = isDebug;
     if (anchors.length === 0) {
       this.anchors = this.createCircleAnchorPoints({ radius });
@@ -62,6 +62,17 @@ export class Blobber {
 
   getCanvas() {
     return this.graphics.view;
+  }
+
+  moveTo(x, y) {
+    if (x != null) {
+      this.layers.container.x = x;
+      this.x = x;
+    }
+    if (y != null) {
+      this.layers.container.y = y;
+      this.y = y;
+    }
   }
 
   useSharedCanvas({ app }) {
@@ -153,6 +164,7 @@ export class Blobber {
       const x = 0 + radius * Math.cos(circleAngle);
       const y = 0 + radius * Math.sin(circleAngle);
       anchors.push({
+        index: i, // for animation reference if needed
         x,
         y,
         angle: circleAngle - Math.PI / 2, // tangent to circle, not the normal
@@ -173,7 +185,6 @@ export class Blobber {
   }
 
   setupAnchorPointAnimationTargets(anchor) {
-    const { wobble } = this.animation;
     const { original } = anchor;
 
     const pointAngle = (original.angle) % TAU + this.getWobbleAmount('angle', anchor);
@@ -271,16 +282,22 @@ export class Blobber {
   }
 
   startWobbling({
-    wobble = { },
-    getTargets = noOp,
-    updated = noOp,
-    timeRange = { min: 700, max: 2500 }
+    wobble = null,
+    getTargets = null,
+    updated = null,
+    timeRange = null
   } = {}) {
     const { position, angle, length } = wobble;
     this.animation.wobble = { position, angle, length };
-    this.animation.getTargets = getTargets;
-    this.animation.updated = updated;
+    this.animation.getTargets = getTargets != null ? (anchor) => getTargets(anchor) : (anchor => this.setupAnchorPointAnimationTargets(anchor));//getTargets || ((...args) => this.setupAnchorPointAnimationTargets(...args));
+    this.animation.updated = updated || noOp;
     this.animation.timeRange = timeRange;
+    // this.updateWobble({
+    //   wobble,
+    //   getTargets,
+    //   updated,
+    //   timeRange,
+    // });
 
     const copyProperties = ['x', 'y', 'lengthA', 'lengthB', 'angle'];
 
@@ -292,14 +309,28 @@ export class Blobber {
     this.update();
   }
 
+  updateWobble({
+    wobble = { },
+    getTargets = null,
+    updated = null,
+    timeRange = { min: 700, max: 2500 }
+  }) {
+    const { position, angle, length } = wobble;
+    // this.animation.wobble = { position, angle, length };
+    this.animation.getTargets = getTargets != null ? (anchor) => getTargets(anchor) : (anchor => this.setupAnchorPointAnimationTargets(anchor));//getTargets || ((...args) => this.setupAnchorPointAnimationTargets(...args));
+    // this.animation.updated = updated || noOp;
+    // this.animation.timeRange = timeRange;
+  }
+
+  stopWobbling() {
+    for (let point of this.anchors) {
+      point.animation.pause();
+    }
+  }
+
   animateAnchor(anchor, ease) {
     let animationTargets = null;
-    // if (this.properties.setupAnchorPointAnimationTargets) {
-    //   animationTargets = this.properties.setupAnchorPointAnimationTargets();
-    // }
-    // else {
-      animationTargets = this.setupAnchorPointAnimationTargets(anchor);
-    // }
+    animationTargets = this.animation.getTargets(anchor);
     const { lengthA, lengthB, angle, x, y } = animationTargets;
     anchor.animation = anime({
       lengthA,
@@ -338,7 +369,8 @@ export class Blobber {
   onUpdated() {
     this.animation.updated({
       anchors: this.anchors,
-      properties: this.properties
+      x: this.x,
+      y: this.y,
     });
   }
 

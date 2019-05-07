@@ -3,6 +3,7 @@ import _map from 'lodash/map';
 import "./App.scss";
 import Menu from './components/menu/Menu';
 import { menu } from './config';
+import { ScopePage } from './pages/scope/ScopePage';
 
 export class App extends Component {
   addPages() {
@@ -29,7 +30,8 @@ export class App extends Component {
           <Menu list={menu} listRefs={list.refs} />
         </aside>
         <content className="App-content">
-          {list.pages}
+          <ScopePage />
+          {/* {list.pages} */}
         </content>
       </div>
     )

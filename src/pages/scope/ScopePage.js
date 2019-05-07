@@ -158,9 +158,9 @@ export class ScopePage extends Page {
     window.addEventListener('resize', this.onResize);
     this.onResize();
 
-    setTimeout(() => this.takeOver(2), 3000);
+    // setTimeout(() => this.takeOver(2), 3000);
     // setTimeout(() => this.resetBlobs(), 3000);
-    document.addEventListener('click', () => this.resetBlobs);
+    // document.addEventListener('click', () => this.resetBlobs);
   }
 
   componentWillUnmount() {
@@ -272,7 +272,9 @@ export class ScopePage extends Page {
     const { activeSection } = this.state;
     let content = null;
     if (activeSection == null) {
-      content = (<div/>
+      content = (<div className="Page-title Scope-title">
+                    <div className="Scope-reset" onClick={()=>this.takeOver(0)}>&lt;</div>
+            </div>
         // <div>
         //   <p>Our future is changing at an ever-accelerating rate thanks to technology. And nowhere is this more obvious than in the <b>workplace</b>.</p>
         //   <p>Across the globe business is transforming through the application of <b>technology</b>.</p>

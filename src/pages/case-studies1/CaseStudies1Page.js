@@ -1,6 +1,5 @@
 
 import React from 'react';
-import ReactSVG from 'react-svg';
 import { Page } from '../Page';
 import './CaseStudies1Page.scss';
 

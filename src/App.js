@@ -1,34 +1,35 @@
 import React, { Component } from 'react';
+import _map from 'lodash/map';
 import "./App.scss";
 import Menu from './components/menu/Menu';
-import { RationalePage } from './pages/rationale/RationalePage';
-import { ScopePage } from './pages/scope/ScopePage';
-import { Why2Page } from './pages/why2/Why2Page';
-import { Why3Page } from './pages/why3/Why3Page';
-import { pages } from './config';
-import { How1Page } from './pages/how1/How1Page';
-import { How2Page } from './pages/how2/How2Page';
-import { How3Page } from './pages/how3/How3Page';
-import { How4Page } from './pages/how4/How4Page';
-import { CaseStudies1Page } from './pages/case-studies1/CaseStudies1Page';
+import { menu } from './config';
 
 export class App extends Component {
+  addPages() {
+    const refs = [];
+    const pages = _map(menu, group => {
+      return _map(group.children, (page, i) => {
+        const Component = page.component;
+        let ref = '';
+        if (i === 0) {
+          ref = `page-${group.id}`;
+          refs.push({ ref: ref, id: group.id });
+        }
+        return <div key={i} className={ref}><Component /></div>
+      });
+    });
+    return { pages, refs };
+  }
+
   render() {
+    const list = this.addPages();
     return (
       <div className="App">
         <aside className="App-menu">
-          <Menu pages={pages} />
+          <Menu list={menu} listRefs={list.refs} />
         </aside>
         <content className="App-content">
-          <RationalePage />
-          <Why2Page />
-          <Why3Page />
-          {/* <ScopePage /> */}
-          <How1Page />
-          <How2Page />
-          <How3Page />
-          <How4Page />
-          <CaseStudies1Page />
+          {list.pages}
         </content>
       </div>
     )

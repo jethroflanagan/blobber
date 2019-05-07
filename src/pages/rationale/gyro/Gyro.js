@@ -30,7 +30,7 @@ export default class Gyro extends Component {
       this.setState({
         isIntro: false,
       });
-    }, 5000);
+    }, 6000);
   }
 
   onMouseMove(e) {
@@ -69,7 +69,7 @@ export default class Gyro extends Component {
           <div className="Gyro-y" style={gyroY}>
             <div className="Gyro-pos">
               <div className="Gyro-fill-body">
-                <ReactSVG src="./assets/rationale/gyro-fill-body.svg" />
+                <ReactSVG src="./assets/gyro/gyro-fill-body.svg" />
               </div>
               <div className="Gyro-fill-prop Gyro-fill-prop--top-left">
                 <ReactSVG src="./assets/gyro/gyro-fill-prop.svg" />

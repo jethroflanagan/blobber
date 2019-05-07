@@ -15,7 +15,7 @@
     transition: color $tween;
   }
   &--active &-label {
-    color: $color-focus;
+    color: $color-primary;
   }
 
   &-line {
@@ -28,11 +28,11 @@
   &:hover &-line {
     margin-right: 30px;
     width: 26px;
-    background: $color-focus;
+    background: $color-primary;
   }
   &--active &-line {
     margin-right: 30px;
     width: 26px;
-    background: $color-focus;
+    background: $color-primary;
   }
 }

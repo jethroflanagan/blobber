@@ -1,0 +1,82 @@
+@import "src/styles/vars";
+
+.Resources {
+  background: #2D2323;
+  &-title {
+    font-size: 32px;
+    margin-top: 0;
+    font-weight: normal;
+    margin-bottom: 100px;
+  }
+  &-content {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px 50px;
+    color: #fff;
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+}
+.Card-list {
+  display: flex;
+}
+.Card {
+  display: inline-flex;
+  flex-direction: column;
+  padding: 40px;
+  background: #fff;
+  border-radius: 4px;
+  width: 300px;
+  &:not(:first-child) {
+    margin-left: 40px;
+  }
+  &-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: $color-text;
+    line-height: 27px;
+    margin-bottom: 20px;
+  }
+  &-content {
+    font-size: 16px;
+    color: $color-text;
+    line-height: 24px;
+    margin-bottom: 20px;
+    flex: 1;
+  }
+}
+
+.Footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  &-association {
+    font-size: 14px;
+    opacity: .5;;
+  }
+  &-logos {
+    padding: 80px 0;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    // justify-content: flex-start;
+    & > *:not(:first-child) {
+      margin-left: 40px;
+    }
+  }
+  &-copy {
+    height: 100%;
+    font-size: 14px;
+    opacity: .5;
+    &By {
+      position: absolute;
+      right: 0;
+    }
+  }
+}

@@ -1,0 +1,36 @@
+@import "src/styles/vars";
+
+.Button {
+  $tween: .2s ease-out;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  background: $color-cta;
+  color: #fff;
+  border-color: transparent;
+  transition: background $tween;
+  &:focus, &:hover {
+    background: $color-cta-focus;
+  }
+  border: 1px solid transparent;
+  height: 48px;
+  padding: 0 20px;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &-label {
+    display: inline-block;
+    margin-left: 15px;
+    transition: transform $tween;
+  }
+  &-icon {
+    transition: transform $tween;
+  }
+  &:focus &-label, &:hover &-label {
+    background: $color-cta-focus;
+    transform: scale(1.1);
+  }
+  &:focus &-icon, &:hover &-icon {
+    transform: translate(-5px, 0);
+  }
+}

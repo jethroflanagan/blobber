@@ -1,7 +1,5 @@
 import React from 'react';
 import ReactSVG from 'react-svg';
-import { Blobber, resolveAnchors } from 'src/components/blobber/Blobber';
-import { TAU } from 'src/utils/math';
 import { Page } from '../Page';
 import './How2Page.scss';
 

@@ -1,13 +1,10 @@
-import React, { Component } from 'react'
-import { Page } from '../Page';
-import _map from 'lodash/map';
-import './Why2Page.scss';
-import { List } from 'src/components/list/List';
+import React from 'react';
 import ReactSVG from 'react-svg';
 import { Blobber, resolveAnchors } from 'src/components/blobber/Blobber';
-import { getAngle, getDistance, TAU } from 'src/utils/math';
-import { randomRange } from 'src/utils/random';
-import * as pixi from 'pixi.js';
+import { List } from 'src/components/list/List';
+import { TAU } from 'src/utils/math';
+import { Page } from '../Page';
+import './Why2Page.scss';
 
 const brainFillPoints = [
   {

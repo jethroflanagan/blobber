@@ -171,20 +171,21 @@ export class ScopePage extends Page {
     this.app.stage.removeChild(this.labelsLayer);
     this.setState({ activeSection: index });
     _map(this.circles, ({ blob }, i) => {
-      blob.stopWobbling();
-      // blob.updateWobble({
-      //   getTargets: (anchor) => this.setupAnchorPointAnimationTargets({ isActive: index === i, anchor }),
-      // });
-      blob.startWobbling({
-        wobble: {
-            position: () => ({ min: -10, max: 10 }),
-            length: (length) => ({ min: length * .8, max: length * 1.2 }),
-            angle: (angle) => ({ min: -Math.PI / 20, max: Math.PI / 20 }),
-        },
-        updated: (blob) => this.onUpdateBlob({ index: i, blob }),
-        timeRange: { min: 200, max: 1500 },
-        getTargets: (anchor) => this.setupAnchorPointAnimationTargets({ circle: this.circles[i], isActive: index === i, anchor }),
+      // blob.stopWobbling();
+      blob.updateWobble({
+        getTargets: (anchor) => this.setupAnchorPointAnimationTargets({ isActive: index === i, anchor, circle: this.circles[i] }),
+        timeRange: { min: 200, max: 1000 },
       });
+      // blob.startWobbling({
+      //   wobble: {
+      //       position: () => ({ min: -10, max: 10 }),
+      //       length: (length) => ({ min: length * .8, max: length * 1.2 }),
+      //       angle: (angle) => ({ min: -Math.PI / 20, max: Math.PI / 20 }),
+      //   },
+      //   updated: (blob) => this.onUpdateBlob({ index: i, blob }),
+      //   timeRange: { min: 200, max: 1500 },
+      //   getTargets: (anchor) => this.setupAnchorPointAnimationTargets({ circle: this.circles[i], isActive: index === i, anchor }),
+      // });
     });
   }
 
@@ -255,7 +256,7 @@ export class ScopePage extends Page {
       lengthB = radius / 2 + randomRange(-2, 2);
       const circleAngle = Math.PI * 2 * index / 4;
 
-      positionOffset = radius / 20;
+      positionOffset = radius / 20 + 5;
       x = 0 + radius * Math.cos(circleAngle);
       y = 0 + radius * Math.sin(circleAngle);
       angle = anchor.angle;

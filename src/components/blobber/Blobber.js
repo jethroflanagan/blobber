@@ -33,6 +33,7 @@ export class Blobber {
     getTargets: null,
     timeRange: null,
     requestAnimationFrameId: null, // requestAnimationFrameId
+    isRunning: false,
   };
 
   x = null; // relative point for anchors
@@ -311,16 +312,27 @@ export class Blobber {
   }
 
   updateWobble({
-    wobble = { },
+    wobble = null,
     getTargets = null,
     updated = null,
-    timeRange = { min: 700, max: 2500 }
+    timeRange = null
   }) {
-    const { position, angle, length } = wobble;
-    // this.animation.wobble = { position, angle, length };
-    this.animation.getTargets = getTargets != null ? (anchor) => getTargets(anchor) : (anchor => this.setupAnchorPointAnimationTargets(anchor));//getTargets || ((...args) => this.setupAnchorPointAnimationTargets(...args));
-    // this.animation.updated = updated || noOp;
-    // this.animation.timeRange = timeRange;
+    if (wobble) {
+      const { position, angle, length } = wobble;
+      this.animation.wobble = { position, angle, length };
+    }
+    if (getTargets) {
+      this.animation.getTargets = (anchor) => getTargets(anchor);
+    }
+    else {
+      this.animation.getTargets = (anchor => this.setupAnchorPointAnimationTargets(anchor));
+    }
+    if (updated) {
+      this.animation.updated = () => updated() || noOp;
+    }
+    if (timeRange) {
+      this.animation.timeRange = timeRange;
+    }
   }
 
   stopWobbling() {
@@ -360,14 +372,15 @@ export class Blobber {
   }
 
   update() {
-    // already running
-    if (this.animation.requestAnimationFrameId) return;
-
-    this.animation.requestAnimationFrameId = requestAnimationFrame(() => {
-      this.drawBlob();
-      this.onUpdated();
-      this.update();
-    });
+    if (this.animation.isRunning) return;
+    const run = () => {
+      this.animation.requestAnimationFrameId = requestAnimationFrame(() => {
+        this.drawBlob();
+        this.onUpdated();
+        run();
+      });
+    }
+    run();
   }
 
   onUpdated() {

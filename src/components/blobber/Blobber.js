@@ -32,6 +32,7 @@ export class Blobber {
     wobbleAmount: null,
     getTargets: null,
     timeRange: null,
+    requestAnimationFrameId: null, // requestAnimationFrameId
   };
 
   x = null; // relative point for anchors
@@ -359,7 +360,10 @@ export class Blobber {
   }
 
   update() {
-    requestAnimationFrame(() => {
+    // already running
+    if (this.animation.requestAnimationFrameId) return;
+
+    this.animation.requestAnimationFrameId = requestAnimationFrame(() => {
       this.drawBlob();
       this.onUpdated();
       this.update();

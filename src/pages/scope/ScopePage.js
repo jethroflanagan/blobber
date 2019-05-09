@@ -171,9 +171,19 @@ export class ScopePage extends Page {
     this.app.stage.removeChild(this.labelsLayer);
     this.setState({ activeSection: index });
     _map(this.circles, ({ blob }, i) => {
-      // blob.stopWobbling();
-      blob.updateWobble({
-        getTargets: (anchor) => this.setupAnchorPointAnimationTargets({ isActive: index === i, anchor }),
+      blob.stopWobbling();
+      // blob.updateWobble({
+      //   getTargets: (anchor) => this.setupAnchorPointAnimationTargets({ isActive: index === i, anchor }),
+      // });
+      blob.startWobbling({
+        wobble: {
+            position: () => ({ min: -10, max: 10 }),
+            length: (length) => ({ min: length * .8, max: length * 1.2 }),
+            angle: (angle) => ({ min: -Math.PI / 20, max: Math.PI / 20 }),
+        },
+        updated: (blob) => this.onUpdateBlob({ index: i, blob }),
+        timeRange: { min: 200, max: 1500 },
+        getTargets: (anchor) => this.setupAnchorPointAnimationTargets({ circle: this.circles[i], isActive: index === i, anchor }),
       });
     });
   }
@@ -186,11 +196,12 @@ export class ScopePage extends Page {
       // blob.stopWobbling();
       blob.updateWobble({
         getTargets: null,
+        timeRange: { min: 700, max: 2500 },
       });
     });
   }
 
-  setupAnchorPointAnimationTargets({ isActive, anchor }) {
+  setupAnchorPointAnimationTargets({ isActive, anchor, circle }) {
     const TAU = Math.PI * 2;
     const { original, index } = anchor;
 
@@ -206,6 +217,7 @@ export class ScopePage extends Page {
     const offsetY = 0;
     const width = el.offsetWidth / 2.7;
     const height = el.offsetHeight / 2.7;
+    let positionOffset = 0;
 
     if (isActive) {
       // tl
@@ -232,28 +244,30 @@ export class ScopePage extends Page {
         y = height;
         angle = TAU / 8;
       }
-      x += randomRange(-10, 10);
-      y += randomRange(-10, 10);
+      positionOffset = 10;
     }
     else {
       // x = 0;
       // y = 0;
-      lengthA = 30 + randomRange(-5, 5);
-      lengthB = 30 + randomRange(-5, 5);
 
-      const radius = 60;
+      const radius = Math.pow(2, circle.radius / 300) * 30;
+      lengthA = radius / 2 + randomRange(-2, 2);
+      lengthB = radius / 2 + randomRange(-2, 2);
       const circleAngle = Math.PI * 2 * index / 4;
-      x = 0 + radius * Math.cos(circleAngle) + randomRange(-10, 10);
-      y = 0 + radius * Math.sin(circleAngle) + randomRange(-10, 10);
+
+      positionOffset = radius / 20;
+      x = 0 + radius * Math.cos(circleAngle);
+      y = 0 + radius * Math.sin(circleAngle);
       angle = anchor.angle;
     }
+
     return {
       ...anchor,
       angle, // tangent
       lengthA,
       lengthB,
-      x: x,// + randomRange(-20, 20),
-      y: y,// + randomRange(-20, 20),
+      x: x + randomRange(-positionOffset, positionOffset),
+      y: y + randomRange(-positionOffset, positionOffset),
     };
   }
 

@@ -10,12 +10,12 @@ import { randomRange } from 'src/utils/random';
 export class ScopePage extends Page {
   app = null;
   circles = [
-    { color: 0x500A28, radius: 310, label: 'Our world' },
-    { color: 0x640032, radius: 220, label: 'Our communities' },
-    { color: 0x870A3C, radius: 160, label: 'Absa as a whole' },
-    { color: 0xAF144B, radius: 110, label: 'Your vertical' },
-    { color: 0xF0325A, radius: 60, label: 'Your team' },
-    { color: 0xF05A7D, radius: 30, label: 'You' },
+    { color: 0x500A28, radius: 310, label: 'Our world', id: 'world' },
+    { color: 0x640032, radius: 220, label: 'Our communities', id: 'community' },
+    { color: 0x870A3C, radius: 160, label: 'Absa as a whole', id: 'company' },
+    { color: 0xAF144B, radius: 110, label: 'Your vertical', id: 'vertical' },
+    { color: 0xF0325A, radius: 60, label: 'Your team', id: 'team' },
+    { color: 0xF05A7D, radius: 30, label: 'You', id: 'you' },
   ];
   labels = [];
 
@@ -34,60 +34,73 @@ export class ScopePage extends Page {
     this.state = {
       activeSection: null,
     };
+
+    this.createBlobs();
+    this.createLines();
+
   }
 
-  createLabels() {
+  createLines() {
     this.labelsLayer = new pixi.Container();
-
-    _map(this.circles, (circle, i) => this.createLabel({ text: circle.label, id: i }));
-
+    const labels = _map(this.circles, circle => {
+      const line = new pixi.Graphics();
+      this.labelsLayer.addChild(line);
+      return {
+        line,
+        position: { x: 0, y: 0 },
+      };
+    });
+    this.setState({ labels });
     this.app.stage.addChild(this.labelsLayer);
   }
 
-  createLabel({ id, text }) {
-    const PADDING_X = 10;
-    const PADDING_Y = 5;
-
-    const style = new pixi.TextStyle({
-      fontFamily: 'Source Sans Pro',
-      fontSize: 16,
-      // fontStyle: 'italic',
-      fontWeight: 400,
-      fill: '#fff',
-      // fill: ['#ffffff', '#00ff99'], // gradient
-
-      dropShadow: true,
-      dropShadowColor: 'rgba(0,0,0,.1)',
-      dropShadowBlur: 7,
-      dropShadowAngle: 0,
-      dropShadowDistance: 0,
+  createLabels() {
+    return _map(this.circles, ({ id, label }, i) => {
+      return <div className="Scope-blobLabel" key={id} ref={'label-' + id}>{label}</div>
     });
+    // const PADDING_X = 10;
+    // const PADDING_Y = 5;
 
-    const label = new pixi.Text(text, style);
-    // label.filters = [new pixi.filters.BlurFilter(this.props.radius / 10)];
-    // const target = this.anchors[1];
-    // target.label = label;
-    // label.target = target;
-    label.x = PADDING_X;
-    label.y = -label.height / 2;
+    // const style = new pixi.TextStyle({
+    //   fontFamily: 'Source Sans Pro',
+    //   fontSize: 16,
+    //   // fontStyle: 'italic',
+    //   fontWeight: 400,
+    //   fill: '#fff',
+    //   // fill: ['#ffffff', '#00ff99'], // gradient
 
-    const line = new pixi.Graphics();
+    //   dropShadow: true,
+    //   dropShadowColor: 'rgba(0,0,0,.1)',
+    //   dropShadowBlur: 7,
+    //   dropShadowAngle: 0,
+    //   dropShadowDistance: 0,
+    // });
 
-    const background = new pixi.Graphics();
-    background.lineStyle(1, 0xffffff);
-    background.beginFill(0xffffff, .4);
-    background.drawRoundedRect(0, label.y - PADDING_Y, label.width + PADDING_X * 3, label.height + PADDING_Y * 2, 4);
-    background.endFill();
+    // const label = new pixi.Text(text, style);
+    // // label.filters = [new pixi.filters.BlurFilter(this.props.radius / 10)];
+    // // const target = this.anchors[1];
+    // // target.label = label;
+    // // label.target = target;
+    // label.x = PADDING_X;
+    // label.y = -label.height / 2;
+
+    // const line = new pixi.Graphics();
+
+    // const background = new pixi.Graphics();
+    // background.lineStyle(1, 0xffffff);
+    // background.beginFill(0xffffff, .4);
+    // background.drawRoundedRect(0, label.y - PADDING_Y, label.width + PADDING_X * 3, label.height + PADDING_Y * 2, 4);
+    // background.endFill();
 
 
-    const container = new pixi.Container();
-    container.addChild(background);
-    container.addChild(label);
+    // const container = new pixi.Container();
+    // container.addChild(background);
+    // container.addChild(label);
 
-    this.labelsLayer.addChild(line);
-    this.labelsLayer.addChild(container);
+    // this.labelsLayer.addChild(line);
+    // this.labelsLayer.addChild(container);
 
-    this.labels.push({ label: container, line, y: 0 });
+    // this.labels.push({ label: container, line, y: 0 });
   }
 
   createBlobs() {
@@ -97,7 +110,6 @@ export class ScopePage extends Page {
       const { color, radius } = circle;
       const blob = new Blobber({ alpha: 1, color, x, y, radius });
       blob.useSharedCanvas({ app: this.app });
-      this.refs.blobs.appendChild(blob.getCanvas());
       blob.startWobbling({
         wobble: {
             position: () => ({ min: -10, max: 10 }),
@@ -109,21 +121,20 @@ export class ScopePage extends Page {
       });
       circle.blob = blob;
     });
-    this.refs.blobs.appendChild(this.app.view);
   }
 
   onUpdateBlob({ index, blob }) {
+    if (!this.labels.length) return;
     const { anchors, x, y } = blob;
-    const { label, line } = this.labels[index];
+    const { line, position } = this.labels[index];
 
     // bottom
     const point = anchors[1];
-    this.labels[index].y = point.y;
 
-    const nextLabel = index === this.labels.length - 1 ? null : this.labels[index + 1];
+    const nextPosition = index === this.labels.length - 1 ? null : this.labels[index + 1].position;
     let offsetStartY = 0;
-    if (nextLabel != null) {
-      offsetStartY = (nextLabel.y - point.y) / 2;
+    if (nextPosition != null) {
+      offsetStartY = (nextPosition.y - point.y) / 2;
     }
     else {
       offsetStartY = (anchors[3].y - point.y) / 2;
@@ -135,28 +146,35 @@ export class ScopePage extends Page {
     const startX = x;
     const startY = y + point.y + offsetStartY;
 
-    label.x = x + point.original.x + 40;
-    label.y = y + this.circles[index].radius - 20;
+    let labelX = x + point.original.x + 40;
+    let labelY = y + this.circles[index].radius - 20;
 
-    if (nextLabel == null) {
-      label.y = y;
+    if (nextPosition == null) {
+      labelY = y;
     }
 
+    this.setState(({ labels }) => {
+      labels[index].position.x = point.x;
+      labels[index].position.y = point.y;
+      return {
+        labels: { ...labels }
+      }
+    });
 
     line.clear();
     line.lineStyle(2, 0xffffff, 1);
     line.moveTo(startX + 3, startY);
-    line.lineTo(label.x, label.y);
+    line.lineTo(labelX, labelY);
     line.lineStyle(2, 0xffffff, 1);
     line.drawCircle(startX, startY, 4);
     // console.log(label.x, label.y);
   }
 
   componentDidMount() {
-    this.createBlobs();
-    this.createLabels();
     window.addEventListener('resize', this.onResize);
     this.onResize();
+
+    this.refs.blobs.appendChild(this.app.view);
 
     // setTimeout(() => this.takeOver(2), 3000);
     // setTimeout(() => this.resetBlobs(), 3000);
@@ -310,9 +328,14 @@ export class ScopePage extends Page {
         </div>
       );
     }
+
+    const labels = this.createLabels();
+
     return (
       <div className="Page Scope">
-        <div className="Scope-blobs" ref="blobs" />
+        <div className="Scope-blobs" ref="blobs">
+          <div className="Scope-labels">{labels}</div>
+        </div>
         <div className="Page-image"> {/* keep content on right */}
         </div>
         <div className="Page-content Scope-content">

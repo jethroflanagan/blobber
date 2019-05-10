@@ -311,6 +311,34 @@ export class Blobber {
     this.update();
   }
 
+  // contract({
+  //   radius = null,
+  //   getTargets = null,
+  //   updated = null,
+  //   timeRange = null
+  // } = {}) {
+  //   const { position, angle, length } = wobble;
+  //   this.animation.wobble = { position, angle, length };
+  //   this.animation.getTargets = getTargets != null ? (anchor) => getTargets(anchor) : (anchor => this.setupAnchorPointAnimationTargets(anchor));//getTargets || ((...args) => this.setupAnchorPointAnimationTargets(...args));
+  //   this.animation.updated = updated || noOp;
+  //   this.animation.timeRange = timeRange;
+  //   // this.updateWobble({
+  //   //   wobble,
+  //   //   getTargets,
+  //   //   updated,
+  //   //   timeRange,
+  //   // });
+
+  //   const copyProperties = ['x', 'y', 'lengthA', 'lengthB', 'angle'];
+
+  //   for (let point of this.anchors) {
+  //     point.original = {};
+  //     _map(copyProperties, prop => point.original[prop] = point[prop]);
+  //     this.animateAnchor(point);
+  //   }
+  //   this.update();
+  // }
+
   updateWobble({
     wobble = null,
     getTargets = null,
@@ -345,6 +373,7 @@ export class Blobber {
     let animationTargets = null;
     animationTargets = this.animation.getTargets(anchor);
     const { lengthA, lengthB, angle, x, y } = animationTargets;
+    if (anchor.animation) anchor.animation.pause();
     anchor.animation = anime({
       lengthA,
       lengthB,

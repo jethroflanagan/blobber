@@ -9,7 +9,7 @@ import { ScopeContent } from './ScopeContent';
 
 const CONTENT_BLOB_TIME_RANGE = { min: 700, max: 2500 };
 const MAX_CIRCLE_RADIUS = 310;
-const CONTENT_BLOB_RADIUS = 4;
+const CONTENT_BLOB_RADIUS = 104;
 
 export class ScopePage extends Page {
   app = null;
@@ -39,6 +39,7 @@ export class ScopePage extends Page {
     this.state = {
       activeSection: null,
       labelPositions: [],
+      contentBlobAnchors: '',
     };
 
     this.createBlobs();
@@ -80,19 +81,6 @@ export class ScopePage extends Page {
     const x = 400;
     const y = 400;
 
-    this.contentBlob = new Blobber({ alpha: 1, color: 0x0, x, y, anchors: this.createContentBlobAnchorPoints({ radius: CONTENT_BLOB_RADIUS }) });
-    this.contentBlob.useSharedCanvas({ app: this.app });
-    // this.contentBlob.createCanvas({ width: 800, height: 800, transparent: true });
-
-    this.contentBlob.startWobbling({
-      wobble: {
-          position: () => ({ min: -10, max: 10 }),
-          length: (length) => ({ min: length * .8, max: length * 1.2 }), //(length) => ({ min: length * .8, max: length * 1.2 }),
-          angle: (angle) => ({ min: -Math.PI / 20, max: Math.PI / 20 }),
-      },
-      timeRange: CONTENT_BLOB_TIME_RANGE,
-    });
-
     _map(this.circles, (circle, i) => {
       const { color, radius } = circle;
       const blob = new Blobber({ alpha: 1, color, x, y, radius });
@@ -107,6 +95,25 @@ export class ScopePage extends Page {
         timeRange: { min: 700, max: 2500 },
       });
       circle.blob = blob;
+    });
+
+    this.createContentBlob({ x, y });
+  }
+
+  createContentBlob({ x, y }) {
+
+    this.contentBlob = new Blobber({ alpha: 1, color: 0x0, x, y, anchors: this.createContentBlobAnchorPoints({ radius: CONTENT_BLOB_RADIUS }) });
+    this.contentBlob.useSharedCanvas({ app: this.app });
+    // this.contentBlob.createCanvas({ width: 800, height: 800, transparent: true });
+
+    this.contentBlob.startWobbling({
+      wobble: {
+          position: () => ({ min: -10, max: 10 }),
+          length: (length) => ({ min: length * .8, max: length * 1.2 }), //(length) => ({ min: length * .8, max: length * 1.2 }),
+          angle: (angle) => ({ min: -Math.PI / 20, max: Math.PI / 20 }),
+      },
+      timeRange: CONTENT_BLOB_TIME_RANGE,
+      updated: (blob) => this.onUpdateContentBlob(blob),
     });
   }
 
@@ -128,6 +135,12 @@ export class ScopePage extends Page {
       });
     }
     return anchors;
+  }
+
+  onUpdateContentBlob({ anchors, x, y }) {
+    this.setState({
+      contentBlobAnchors: anchors,
+    });
   }
 
   onUpdateBlob({ index, blob }) {
@@ -343,31 +356,35 @@ export class ScopePage extends Page {
       circle.blob.moveTo(x, y);
     });
     this.contentBlob.moveTo(x, y);
-
   }
 
   render() {
     const { activeSection } = this.state;
     let content = null;
+    const contentBlobAnchorsOffset = {x:0, y: 200};
     if (activeSection == null) {
       content = (
         <ScopeContent title="Oh my gosh" content={`
           Our future is changing at an ever-accelerating rate thanks to technology. And nowhere is this more obvious than in the <b>workplace</b>.
           Across the globe business is transforming through the application of <b>technology</b>.
           So where will you be in 5 years’ time?
-          `}/>
+          `}
+          maskAnchors={this.state.contentBlobAnchors}maskOffset={contentBlobAnchorsOffset}/>
       );
     }
     else {
       const section = this.circles[activeSection];
 
       content = (
+
         <div>
           <div className="Page-title Scope-title">
             <div className="Scope-reset" onClick={()=>this.resetBlobs()}>&lt;</div>
-            {section.label}
           </div>
-          <p>Blah blah.</p>
+          <ScopeContent title={section.label} content={`
+          All of the words blah blah
+          `}
+          maskAnchors={this.state.contentBlobAnchors} maskOffset={contentBlobAnchorsOffset}/>
         </div>
       );
     }

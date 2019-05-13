@@ -33,6 +33,7 @@ export class ScopePage extends Page {
 
     this.state = {
       activeSection: null,
+      labelPositions: [],
     };
 
     this.createBlobs();
@@ -46,17 +47,27 @@ export class ScopePage extends Page {
       const line = new pixi.Graphics();
       this.labelsLayer.addChild(line);
       return {
+        id: circle.id,
+        label: circle.label,
         line,
         position: { x: 0, y: 0 },
+        labelPosition: { x: 0, y: 0 },
       };
     });
-    this.setState({ labels });
+    // this.setState({ labels });
+    this.labels = labels;
     this.app.stage.addChild(this.labelsLayer);
   }
 
   createLabels() {
-    return _map(this.circles, ({ id, label }, i) => {
-      return <div className="Scope-blobLabel" key={id} ref={'label-' + id}>{label}</div>
+    return _map(this.labels, ({ id, label }, i) => {
+      let position = this.state.labelPositions[i];
+      if (!position) {
+        position = { x: 0, y: 0 };
+      }
+      position.y -= 20;
+      const style = { transform: `translate(${position.x}px, ${position.y}px)` };
+      return <div className="Scope-blobLabel" key={id} style={style}>{label}</div>
     });
     // const PADDING_X = 10;
     // const PADDING_Y = 5;
@@ -106,6 +117,7 @@ export class ScopePage extends Page {
   createBlobs() {
     const x = 400;
     const y = 400;
+
     _map(this.circles, (circle, i) => {
       const { color, radius } = circle;
       const blob = new Blobber({ alpha: 1, color, x, y, radius });
@@ -126,7 +138,7 @@ export class ScopePage extends Page {
   onUpdateBlob({ index, blob }) {
     if (!this.labels.length) return;
     const { anchors, x, y } = blob;
-    const { line, position } = this.labels[index];
+    const { line, position, labelPosition } = this.labels[index];
 
     // bottom
     const point = anchors[1];
@@ -148,18 +160,24 @@ export class ScopePage extends Page {
 
     let labelX = x + point.original.x + 40;
     let labelY = y + this.circles[index].radius - 20;
-
     if (nextPosition == null) {
       labelY = y;
     }
+    labelY = labelY + (startY - labelY) / 2
 
-    this.setState(({ labels }) => {
-      labels[index].position.x = point.x;
-      labels[index].position.y = point.y;
-      return {
-        labels: { ...labels }
-      }
-    });
+    position.x = point.x;
+    position.y = point.y;
+    labelPosition.x = labelX;
+    labelPosition.y = labelY;
+
+
+    // this.setState(({ labels }) => {
+    //   position.x = point.x;
+    //   position.y = point.y;
+    //   return {
+    //     labels: { ...labels }
+    //   }
+    // });
 
     line.clear();
     line.lineStyle(2, 0xffffff, 1);
@@ -179,10 +197,26 @@ export class ScopePage extends Page {
     // setTimeout(() => this.takeOver(2), 3000);
     // setTimeout(() => this.resetBlobs(), 3000);
     // document.addEventListener('click', () => this.resetBlobs);
+
+    // TODO: remove on unmount
+    this.updateLabels();
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.onResize);
+  }
+
+  updateLabels() {
+    requestAnimationFrame(() => {
+      // style={{ left: position.x + 'px', top: position.y + 'px' }}
+
+      const labelPositions = _map(this.labels, 'labelPosition');
+      this.setState({
+        labelPositions,
+      });
+      // console.log(labelPositions);
+      this.updateLabels();
+    });
   }
 
   takeOver(index) {
@@ -333,7 +367,8 @@ export class ScopePage extends Page {
 
     return (
       <div className="Page Scope">
-        <div className="Scope-blobs" ref="blobs">
+        <div className="Scope-blobs">
+          <div ref="blobs" className="Scope-blobCanvas"/>
           <div className="Scope-labels">{labels}</div>
         </div>
         <div className="Page-image"> {/* keep content on right */}

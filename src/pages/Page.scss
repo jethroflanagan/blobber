@@ -35,4 +35,11 @@
   &-columns {
     column-count: 2;
   }
+  &-wobbly {
+    bottom: 0;
+    height: 140px;
+    position: absolute;
+    width: 100%;
+    z-index: 10000;
+  }
 }

@@ -97,6 +97,10 @@ export class Blobber {
     el.appendChild(this.graphics.view);
   }
 
+  changeColor(color) {
+    this.color = color;
+  }
+
   setup() {
     const { layers } = this;
     layers.container = new pixi.Container();
@@ -292,7 +296,7 @@ export class Blobber {
     const { position, angle, length } = wobble;
     this.animation.wobble = { position, angle, length };
     this.animation.getTargets = getTargets != null ? (anchor) => getTargets(anchor) : (anchor => this.setupAnchorPointAnimationTargets(anchor));//getTargets || ((...args) => this.setupAnchorPointAnimationTargets(...args));
-    this.animation.updated = updated || noOp;
+    this.animation.updated = updated != null ? (({ anchors, x, y }) => updated({ anchors, x, y })) : (() => {});
     this.animation.timeRange = timeRange;
     // this.updateWobble({
     //   wobble,

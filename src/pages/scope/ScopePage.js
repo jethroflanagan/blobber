@@ -5,7 +5,11 @@ import { Blobber } from 'src/components/blobber/Blobber';
 import { Page } from '../Page';
 import './ScopePage.scss';
 import { randomRange } from 'src/utils/random';
+import { ScopeContent } from './ScopeContent';
 
+const CONTENT_BLOB_TIME_RANGE = { min: 700, max: 2500 };
+const MAX_CIRCLE_RADIUS = 310;
+const CONTENT_BLOB_RADIUS = 4;
 
 export class ScopePage extends Page {
   app = null;
@@ -17,6 +21,7 @@ export class ScopePage extends Page {
     { color: 0xF0325A, radius: 60, label: 'Your team', id: 'team' },
     { color: 0xF05A7D, radius: 30, label: 'You', id: 'you' },
   ];
+  contentBlob = null;
   labels = [];
 
   constructor() {
@@ -67,56 +72,26 @@ export class ScopePage extends Page {
       }
       position.y -= 20;
       const style = { transform: `translate(${position.x}px, ${position.y}px)` };
-      return <div className="Scope-blobLabel" key={id} style={style}>{label}</div>
+      return <div className="Scope-blobLabel" key={id} style={style} onClick={e => this.takeOver(i)}>{label}</div>
     });
-    // const PADDING_X = 10;
-    // const PADDING_Y = 5;
-
-    // const style = new pixi.TextStyle({
-    //   fontFamily: 'Source Sans Pro',
-    //   fontSize: 16,
-    //   // fontStyle: 'italic',
-    //   fontWeight: 400,
-    //   fill: '#fff',
-    //   // fill: ['#ffffff', '#00ff99'], // gradient
-
-    //   dropShadow: true,
-    //   dropShadowColor: 'rgba(0,0,0,.1)',
-    //   dropShadowBlur: 7,
-    //   dropShadowAngle: 0,
-    //   dropShadowDistance: 0,
-    // });
-
-    // const label = new pixi.Text(text, style);
-    // // label.filters = [new pixi.filters.BlurFilter(this.props.radius / 10)];
-    // // const target = this.anchors[1];
-    // // target.label = label;
-    // // label.target = target;
-    // label.x = PADDING_X;
-    // label.y = -label.height / 2;
-
-    // const line = new pixi.Graphics();
-
-    // const background = new pixi.Graphics();
-    // background.lineStyle(1, 0xffffff);
-    // background.beginFill(0xffffff, .4);
-    // background.drawRoundedRect(0, label.y - PADDING_Y, label.width + PADDING_X * 3, label.height + PADDING_Y * 2, 4);
-    // background.endFill();
-
-
-    // const container = new pixi.Container();
-    // container.addChild(background);
-    // container.addChild(label);
-
-    // this.labelsLayer.addChild(line);
-    // this.labelsLayer.addChild(container);
-
-    // this.labels.push({ label: container, line, y: 0 });
   }
 
   createBlobs() {
     const x = 400;
     const y = 400;
+
+    this.contentBlob = new Blobber({ alpha: 1, color: 0x0, x, y, anchors: this.createContentBlobAnchorPoints({ radius: CONTENT_BLOB_RADIUS }) });
+    this.contentBlob.useSharedCanvas({ app: this.app });
+    // this.contentBlob.createCanvas({ width: 800, height: 800, transparent: true });
+
+    this.contentBlob.startWobbling({
+      wobble: {
+          position: () => ({ min: -10, max: 10 }),
+          length: (length) => ({ min: length * .8, max: length * 1.2 }), //(length) => ({ min: length * .8, max: length * 1.2 }),
+          angle: (angle) => ({ min: -Math.PI / 20, max: Math.PI / 20 }),
+      },
+      timeRange: CONTENT_BLOB_TIME_RANGE,
+    });
 
     _map(this.circles, (circle, i) => {
       const { color, radius } = circle;
@@ -133,6 +108,26 @@ export class ScopePage extends Page {
       });
       circle.blob = blob;
     });
+  }
+
+  createContentBlobAnchorPoints({ radius }) {
+    const anchors = [];
+    const numPoints = 4;
+    for (let i = 0; i < numPoints; i++) {
+      // Subtract 45 degrees so anchors are in corners for content transition
+      const circleAngle = Math.PI * 2 * i / numPoints - Math.PI / 4;
+      const x = 0 + radius * Math.cos(circleAngle);
+      const y = 0 + radius * Math.sin(circleAngle);
+      anchors.push({
+        index: i, // for animation reference if needed
+        x,
+        y,
+        angle: circleAngle - Math.PI / 2, // tangent to circle, not the normal
+        lengthA: radius  /2,
+        lengthB: radius / 2,
+      });
+    }
+    return anchors;
   }
 
   onUpdateBlob({ index, blob }) {
@@ -208,26 +203,34 @@ export class ScopePage extends Page {
 
   updateLabels() {
     requestAnimationFrame(() => {
-      // style={{ left: position.x + 'px', top: position.y + 'px' }}
-
       const labelPositions = _map(this.labels, 'labelPosition');
       this.setState({
         labelPositions,
       });
-      // console.log(labelPositions);
       this.updateLabels();
     });
   }
 
   takeOver(index) {
+    const activeSection = index;
     this.app.stage.removeChild(this.labelsLayer);
-    this.setState({ activeSection: index });
-    _map(this.circles, ({ blob }, i) => {
-      // blob.stopWobbling();
+    this.setState({ activeSection });
+
+    this.contentBlob.changeColor(this.circles[activeSection].color);
+    this.contentBlob.updateWobble({
+      getTargets: (anchor) => this.setupAnchorPointAnimationTargets({ isActive: true, anchor, radius: 0 }),
+      timeRange: { min: 1500, max: 3000 },
+    });
+
+    _map(this.circles, ({ blob, radius }, i) => {
       blob.updateWobble({
-        getTargets: (anchor) => this.setupAnchorPointAnimationTargets({ isActive: index === i, anchor, circle: this.circles[i] }),
+        getTargets: (anchor) => this.setupAnchorPointAnimationTargets({ isActive: false, anchor, circleRadius: radius }),
         timeRange: { min: 200, max: 1000 },
       });
+    });
+
+
+      // blob.stopWobbling();
       // blob.startWobbling({
       //   wobble: {
       //       position: () => ({ min: -10, max: 10 }),
@@ -238,12 +241,16 @@ export class ScopePage extends Page {
       //   timeRange: { min: 200, max: 1500 },
       //   getTargets: (anchor) => this.setupAnchorPointAnimationTargets({ circle: this.circles[i], isActive: index === i, anchor }),
       // });
-    });
   }
 
   resetBlobs() {
     this.setState({ activeSection: null });
     this.app.stage.addChild(this.labelsLayer);
+
+    this.contentBlob.updateWobble({
+      getTargets: null,
+      timeRange: CONTENT_BLOB_TIME_RANGE,
+    });
 
     _map(this.circles, ({ blob }, i) => {
       // blob.stopWobbling();
@@ -254,7 +261,7 @@ export class ScopePage extends Page {
     });
   }
 
-  setupAnchorPointAnimationTargets({ isActive, anchor, circle }) {
+  setupAnchorPointAnimationTargets({ isActive, anchor, circleRadius }) {
     const TAU = Math.PI * 2;
     const { original, index } = anchor;
 
@@ -302,8 +309,7 @@ export class ScopePage extends Page {
     else {
       // x = 0;
       // y = 0;
-
-      const radius = Math.pow(2, circle.radius / 300) * 30;
+      const radius =  Math.pow(2, circleRadius / MAX_CIRCLE_RADIUS) * 30
       lengthA = radius / 2 + randomRange(-2, 2);
       lengthB = radius / 2 + randomRange(-2, 2);
       const circleAngle = Math.PI * 2 * index / 4;
@@ -330,23 +336,26 @@ export class ScopePage extends Page {
     const height = el.offsetHeight;
     this.app.renderer.resize(width, height);
 
+    const x = width / 2 - 300;
+    const y = height / 2;
+
     _map(this.circles, circle => {
-      circle.blob.moveTo(width / 2 - 300, height / 2);
+      circle.blob.moveTo(x, y);
     });
+    this.contentBlob.moveTo(x, y);
+
   }
 
   render() {
     const { activeSection } = this.state;
     let content = null;
     if (activeSection == null) {
-      content = (<div className="Page-title Scope-title">
-                    <div className="Scope-reset" onClick={()=>this.takeOver(0)}>&lt;</div>
-            </div>
-        // <div>
-        //   <p>Our future is changing at an ever-accelerating rate thanks to technology. And nowhere is this more obvious than in the <b>workplace</b>.</p>
-        //   <p>Across the globe business is transforming through the application of <b>technology</b>.</p>
-        //   <p>So where will you be in 5 years’ time?</p>
-        // </div>
+      content = (
+        <ScopeContent title="Oh my gosh" content={`
+          Our future is changing at an ever-accelerating rate thanks to technology. And nowhere is this more obvious than in the <b>workplace</b>.
+          Across the globe business is transforming through the application of <b>technology</b>.
+          So where will you be in 5 years’ time?
+          `}/>
       );
     }
     else {
@@ -356,9 +365,9 @@ export class ScopePage extends Page {
         <div>
           <div className="Page-title Scope-title">
             <div className="Scope-reset" onClick={()=>this.resetBlobs()}>&lt;</div>
-            {/* {section.label} */}
+            {section.label}
           </div>
-          {/* <p>Blah blah.</p> */}
+          <p>Blah blah.</p>
         </div>
       );
     }

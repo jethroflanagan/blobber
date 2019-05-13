@@ -5,7 +5,6 @@ import { TAU } from 'src/utils/math';
 import { Page } from '../Page';
 import './Why3Page.scss';
 
-
 const brainFillPoints = [
   {
     control1: { x: 217.9, y: 12.62 },

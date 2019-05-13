@@ -14,9 +14,9 @@ export const menu = [
     label: 'why?',
     id: 'why',
     children: [
-     { component: RationalePage },
-     { component: Why2Page },
-     { component: Why3Page },
+     { component: RationalePage, color: 0xF0325A },
+     { component: Why2Page, color: 0xAF144B },
+     { component: Why3Page, color: 0x870A3C },
     ]
   },
   // { label: 'where?',
@@ -28,24 +28,24 @@ export const menu = [
     label: 'how?',
     id: 'how',
     children: [
-    { component: How1Page },
-    { component: How2Page },
-    { component: How3Page },
-    { component: How4Page },
+    { component: How1Page, color: 0xAF144B },
+    { component: How2Page, color: 0xF0325A },
+    { component: How3Page, color: 0xF05A7D },
+    { component: How4Page, color: 0x524A4A },
    ]
   },
   {
     label: 'case study',
     id: 'caseStudy',
     children: [
-    { component: CaseStudies1Page },
+    { component: CaseStudies1Page, color: 0x2D2323 },
    ]
   },
   {
     label: 'resources',
     id: 'resources',
     children: [
-    { component: ResourcesPage },
+    { component: ResourcesPage, color: 0x2D2323 },
    ]
   },
 

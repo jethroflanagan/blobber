@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import './index.scss';
 import { ScopePage } from 'src/pages/scope/ScopePage';
 import { RationalePage } from 'src/pages/rationale/RationalePage';
-import { WobblyLinePage } from 'src/pages/wobbly-line/WobblyLinePage';
 import * as serviceWorker from './serviceWorker';
 import { App } from './App';
 

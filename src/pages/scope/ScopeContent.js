@@ -14,16 +14,16 @@ export class ScopeContent extends Component {
       }
       const point = points[i];
       const nextPoint = i === points.length - 1 ? points[0] : points[i + 1];
-      const offsetAngle = Math.PI / 8 * 4;
+      const offsetAngle = Math.PI / 8 * 2;
       const angle = point.angle + offsetAngle;
       const nextAngle = nextPoint.angle + offsetAngle;
-      const cxA = Math.cos(angle) * point.lengthB;
-      const cyA = Math.sin(angle) * point.lengthB;
-      const cxB = Math.cos(nextAngle) * nextPoint.lengthA;
-      const cyB = Math.sin(nextAngle) * nextPoint.lengthA;
+      const cxA = point.x + Math.cos(angle) * point.lengthB;
+      const cyA = point.y + Math.sin(angle) * point.lengthB;
+      const cxB = nextPoint.x + Math.cos(nextAngle - Math.PI) * nextPoint.lengthA;
+      const cyB = nextPoint.y + Math.sin(nextAngle - Math.PI) * nextPoint.lengthA;
 
-      path += `M ${point.x} ${point.y} `;
-      path += `C ${cxA} ${cyA} `;
+      path += `m ${point.x} ${point.y} `;
+      path += `c ${cxA} ${cyA} `;
       path += `${cxB} ${cyB} `;
       path += `${nextPoint.x} ${nextPoint.y} `;
 

@@ -9,12 +9,12 @@ import { ScopeContent } from './ScopeContent';
 
 const CONTENT_BLOB_TIME_RANGE = { min: 700, max: 2500 };
 const MAX_CIRCLE_RADIUS = 310;
-const CONTENT_BLOB_RADIUS = 104;
-
+const CONTENT_BLOB_RADIUS = 4;
+const offsetBlob = 400;
 export class ScopePage extends Page {
   app = null;
   circles = [
-    { color: 0x500A28, radius: 310, label: 'Our world', id: 'world' },
+    { color: 0x500A28, radius: 290, label: 'Our world', id: 'world' },
     { color: 0x640032, radius: 220, label: 'Our communities', id: 'community' },
     { color: 0x870A3C, radius: 160, label: 'Absa as a whole', id: 'company' },
     { color: 0xAF144B, radius: 110, label: 'Your vertical', id: 'vertical' },
@@ -30,9 +30,9 @@ export class ScopePage extends Page {
       width: 800,
       height: 800,
       antialias: true,
-      transparent: false,
+      transparent: true,
       // resolution: 1,
-      backgroundColor: 0x490924,
+      // backgroundColor: 0x490924,
       // autoResize: true,
     });
 
@@ -71,7 +71,7 @@ export class ScopePage extends Page {
       if (!position) {
         position = { x: 0, y: 0 };
       }
-      position.y -= 20;
+      position.y -= 10;
       const style = { transform: `translate(${position.x}px, ${position.y}px)` };
       return <div className="Scope-blobLabel" key={id} style={style} onClick={e => this.takeOver(i)}>{label}</div>
     });
@@ -80,6 +80,7 @@ export class ScopePage extends Page {
   createBlobs() {
     const x = 400;
     const y = 400;
+
 
     _map(this.circles, (circle, i) => {
       const { color, radius } = circle;
@@ -96,20 +97,20 @@ export class ScopePage extends Page {
       });
       circle.blob = blob;
     });
-
     this.createContentBlob({ x, y });
+
   }
 
   createContentBlob({ x, y }) {
 
     this.contentBlob = new Blobber({ alpha: 1, color: 0x0, x, y, anchors: this.createContentBlobAnchorPoints({ radius: CONTENT_BLOB_RADIUS }) });
-    this.contentBlob.useSharedCanvas({ app: this.app });
-    // this.contentBlob.createCanvas({ width: 800, height: 800, transparent: true });
+    // this.contentBlob.useSharedCanvas({ app: this.app });
+    this.contentBlob.createCanvas({ width: 800, height: 800, transparent: true });
 
     this.contentBlob.startWobbling({
       wobble: {
           position: () => ({ min: -10, max: 10 }),
-          length: (length) => ({ min: length * .8, max: length * 1.2 }), //(length) => ({ min: length * .8, max: length * 1.2 }),
+          length: (length) => ({ min: length * .8, max: length * 1.2 }),
           angle: (angle) => ({ min: -Math.PI / 20, max: Math.PI / 20 }),
       },
       timeRange: CONTENT_BLOB_TIME_RANGE,
@@ -130,7 +131,7 @@ export class ScopePage extends Page {
         x,
         y,
         angle: circleAngle - Math.PI / 2, // tangent to circle, not the normal
-        lengthA: radius  /2,
+        lengthA: radius / 2,
         lengthB: radius / 2,
       });
     }
@@ -286,10 +287,10 @@ export class ScopePage extends Page {
     let y = original.y;
 
     const el = this.refs.blobs;
-    const offsetX = el.offsetWidth / 4;
+    const offsetX = el.offsetWidth / 4 - 200;
     const offsetY = 0;
-    const width = el.offsetWidth / 2.7;
-    const height = el.offsetHeight / 2.7;
+    const width = el.offsetWidth / 4;
+    const height = el.offsetHeight / 4;
     let positionOffset = 0;
 
     if (isActive) {
@@ -322,7 +323,7 @@ export class ScopePage extends Page {
     else {
       // x = 0;
       // y = 0;
-      const radius =  Math.pow(2, circleRadius / MAX_CIRCLE_RADIUS) * 30
+      const radius =  Math.pow(2, circleRadius / MAX_CIRCLE_RADIUS) * 130
       lengthA = radius / 2 + randomRange(-2, 2);
       lengthB = radius / 2 + randomRange(-2, 2);
       const circleAngle = Math.PI * 2 * index / 4;
@@ -355,7 +356,7 @@ export class ScopePage extends Page {
     _map(this.circles, circle => {
       circle.blob.moveTo(x, y);
     });
-    this.contentBlob.moveTo(x, y);
+    this.contentBlob.moveTo(x + offsetBlob, y);
   }
 
   render() {
@@ -363,13 +364,13 @@ export class ScopePage extends Page {
     let content = null;
     const contentBlobAnchorsOffset = {x:0, y: 200};
     if (activeSection == null) {
-      content = (
-        <ScopeContent title="Oh my gosh" content={`
-          Our future is changing at an ever-accelerating rate thanks to technology. And nowhere is this more obvious than in the <b>workplace</b>.
-          Across the globe business is transforming through the application of <b>technology</b>.
-          So where will you be in 5 years’ time?
-          `}
-          maskAnchors={this.state.contentBlobAnchors}maskOffset={contentBlobAnchorsOffset}/>
+      content = (<div/>
+        // <ScopeContent title="Oh my gosh" content={`
+        //   Our future is changing at an ever-accelerating rate thanks to technology. And nowhere is this more obvious than in the <b>workplace</b>.
+        //   Across the globe business is transforming through the application of <b>technology</b>.
+        //   So where will you be in 5 years’ time?
+        //   `}
+        //   maskAnchors={this.state.contentBlobAnchors}maskOffset={contentBlobAnchorsOffset}/>
       );
     }
     else {
@@ -381,10 +382,10 @@ export class ScopePage extends Page {
           <div className="Page-title Scope-title">
             <div className="Scope-reset" onClick={()=>this.resetBlobs()}>&lt;</div>
           </div>
-          <ScopeContent title={section.label} content={`
+          {/* <ScopeContent title={section.label} content={`
           All of the words blah blah
           `}
-          maskAnchors={this.state.contentBlobAnchors} maskOffset={contentBlobAnchorsOffset}/>
+          maskAnchors={this.state.contentBlobAnchors} maskOffset={contentBlobAnchorsOffset}/> */}
         </div>
       );
     }

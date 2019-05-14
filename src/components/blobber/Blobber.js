@@ -493,8 +493,6 @@ export class Blobber {
         // compare lengths to neighboring
         const neighborA = this.anchors[point.neighborA];
         const neighborB = this.anchors[point.neighborB];
-        if (!point || !neighborA)
-          debugger
         const originalDistanceA = getDistance(point.circleX, point.circleY, neighborA.circleX, neighborA.circleY);
         const originalDistanceB = getDistance(point.circleX, point.circleY, neighborB.circleX, neighborB.circleY);
         const distanceA = getDistance(target.x, target.y, neighborA.x, neighborA.y);

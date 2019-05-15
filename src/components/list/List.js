@@ -64,8 +64,6 @@ export class List extends Component {
             length: (length) => ({ min: length * .8, max: length * 1.2 }),
             angle: (angle) => ({ min: -Math.PI / 20, max: Math.PI / 20 }),
         },
-        getTargets: ()=>{},
-        updated: ()=>{},
         timeRange: { min: 1700, max: 3500 },
       });
     }

@@ -63,8 +63,6 @@ export class Why3Page extends Page {
           length: (length) => ({ min: length * .8, max: length * 1.2 }),
           angle: (angle) => ({ min: -TAU / 40, max: TAU / 40 }),
       },
-      getTargets: ()=>{},
-      updated: ()=>{},
       timeRange: { min: 700, max: 2500 },
     });
   }

@@ -1,0 +1,14 @@
+@import "src/styles/vars";
+
+.ScopeContent {
+  &-title {
+    font-family: $font-family;
+    fill: #fff;
+    font-size: 18px;
+  }
+  &-content {
+    font-family: $font-family;
+    fill: #fff;
+    font-size: 14px;
+  }
+}

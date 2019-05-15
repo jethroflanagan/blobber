@@ -32,6 +32,8 @@ export class Blobber {
     wobbleAmount: null,
     getTargets: null,
     timeRange: null,
+    requestAnimationFrameId: null, // requestAnimationFrameId
+    isRunning: false,
   };
 
   x = null; // relative point for anchors
@@ -53,7 +55,7 @@ export class Blobber {
     this.x = x;
     this.y = y;
     this.isInteractive = isInteractive;
-    this.anchors = _cloneDeep(anchors);
+    this.anchors = _cloneDeep(anchors); // dereference
     this.isDebug = isDebug;
     if (anchors.length === 0) {
       this.anchors = this.createCircleAnchorPoints({ radius });
@@ -62,6 +64,17 @@ export class Blobber {
 
   getCanvas() {
     return this.graphics.view;
+  }
+
+  moveTo(x, y) {
+    if (x != null) {
+      this.layers.container.x = x;
+      this.x = x;
+    }
+    if (y != null) {
+      this.layers.container.y = y;
+      this.y = y;
+    }
   }
 
   useSharedCanvas({ app }) {
@@ -82,6 +95,10 @@ export class Blobber {
 
   attachToElement(el) {
     el.appendChild(this.graphics.view);
+  }
+
+  changeColor(color) {
+    this.color = color;
   }
 
   setup() {
@@ -153,6 +170,7 @@ export class Blobber {
       const x = 0 + radius * Math.cos(circleAngle);
       const y = 0 + radius * Math.sin(circleAngle);
       anchors.push({
+        index: i, // for animation reference if needed
         x,
         y,
         angle: circleAngle - Math.PI / 2, // tangent to circle, not the normal
@@ -173,7 +191,6 @@ export class Blobber {
   }
 
   setupAnchorPointAnimationTargets(anchor) {
-    const { wobble } = this.animation;
     const { original } = anchor;
 
     const pointAngle = (original.angle) % TAU + this.getWobbleAmount('angle', anchor);
@@ -271,16 +288,22 @@ export class Blobber {
   }
 
   startWobbling({
-    wobble = { },
-    getTargets = noOp,
-    updated = noOp,
-    timeRange = { min: 700, max: 2500 }
+    wobble = null,
+    getTargets = null,
+    updated = null,
+    timeRange = null
   } = {}) {
     const { position, angle, length } = wobble;
     this.animation.wobble = { position, angle, length };
-    this.animation.getTargets = getTargets;
-    this.animation.updated = updated;
+    this.animation.getTargets = getTargets != null ? (anchor) => getTargets(anchor) : (anchor => this.setupAnchorPointAnimationTargets(anchor));//getTargets || ((...args) => this.setupAnchorPointAnimationTargets(...args));
+    this.animation.updated = updated != null ? (({ anchors, x, y }) => updated({ anchors, x, y })) : (() => {});
     this.animation.timeRange = timeRange;
+    // this.updateWobble({
+    //   wobble,
+    //   getTargets,
+    //   updated,
+    //   timeRange,
+    // });
 
     const copyProperties = ['x', 'y', 'lengthA', 'lengthB', 'angle'];
 
@@ -292,15 +315,69 @@ export class Blobber {
     this.update();
   }
 
+  // contract({
+  //   radius = null,
+  //   getTargets = null,
+  //   updated = null,
+  //   timeRange = null
+  // } = {}) {
+  //   const { position, angle, length } = wobble;
+  //   this.animation.wobble = { position, angle, length };
+  //   this.animation.getTargets = getTargets != null ? (anchor) => getTargets(anchor) : (anchor => this.setupAnchorPointAnimationTargets(anchor));//getTargets || ((...args) => this.setupAnchorPointAnimationTargets(...args));
+  //   this.animation.updated = updated || noOp;
+  //   this.animation.timeRange = timeRange;
+  //   // this.updateWobble({
+  //   //   wobble,
+  //   //   getTargets,
+  //   //   updated,
+  //   //   timeRange,
+  //   // });
+
+  //   const copyProperties = ['x', 'y', 'lengthA', 'lengthB', 'angle'];
+
+  //   for (let point of this.anchors) {
+  //     point.original = {};
+  //     _map(copyProperties, prop => point.original[prop] = point[prop]);
+  //     this.animateAnchor(point);
+  //   }
+  //   this.update();
+  // }
+
+  updateWobble({
+    wobble = null,
+    getTargets = null,
+    updated = null,
+    timeRange = null
+  }) {
+    if (wobble) {
+      const { position, angle, length } = wobble;
+      this.animation.wobble = { position, angle, length };
+    }
+    if (getTargets) {
+      this.animation.getTargets = (anchor) => getTargets(anchor);
+    }
+    else {
+      this.animation.getTargets = (anchor => this.setupAnchorPointAnimationTargets(anchor));
+    }
+    if (updated) {
+      this.animation.updated = () => updated() || noOp;
+    }
+    if (timeRange) {
+      this.animation.timeRange = timeRange;
+    }
+  }
+
+  stopWobbling() {
+    for (let point of this.anchors) {
+      point.animation.pause();
+    }
+  }
+
   animateAnchor(anchor, ease) {
     let animationTargets = null;
-    // if (this.properties.setupAnchorPointAnimationTargets) {
-    //   animationTargets = this.properties.setupAnchorPointAnimationTargets();
-    // }
-    // else {
-      animationTargets = this.setupAnchorPointAnimationTargets(anchor);
-    // }
+    animationTargets = this.animation.getTargets(anchor);
     const { lengthA, lengthB, angle, x, y } = animationTargets;
+    if (anchor.animation) anchor.animation.pause();
     anchor.animation = anime({
       lengthA,
       lengthB,
@@ -328,17 +405,22 @@ export class Blobber {
   }
 
   update() {
-    requestAnimationFrame(() => {
-      this.drawBlob();
-      this.onUpdated();
-      this.update();
-    });
+    if (this.animation.isRunning) return;
+    const run = () => {
+      this.animation.requestAnimationFrameId = requestAnimationFrame(() => {
+        this.drawBlob();
+        this.onUpdated();
+        run();
+      });
+    }
+    run();
   }
 
   onUpdated() {
     this.animation.updated({
       anchors: this.anchors,
-      properties: this.properties
+      x: this.x,
+      y: this.y,
     });
   }
 
@@ -411,8 +493,6 @@ export class Blobber {
         // compare lengths to neighboring
         const neighborA = this.anchors[point.neighborA];
         const neighborB = this.anchors[point.neighborB];
-        if (!point || !neighborA)
-          debugger
         const originalDistanceA = getDistance(point.circleX, point.circleY, neighborA.circleX, neighborA.circleY);
         const originalDistanceB = getDistance(point.circleX, point.circleY, neighborB.circleX, neighborB.circleY);
         const distanceA = getDistance(target.x, target.y, neighborA.x, neighborA.y);

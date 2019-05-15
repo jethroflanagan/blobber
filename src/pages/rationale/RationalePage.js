@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Gyro from './gyro/Gyro';
 import { Page } from 'src/pages/Page';
 import './RationalePage.scss';

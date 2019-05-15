@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import ReactSVG from 'react-svg';
 import "./Gyro.scss";
-import { getDistance, clamp } from '../../../utils/math';
+import { getDistance, clamp } from 'src/utils/math';
 
 const MAX_SPEED = 100;
 
@@ -68,6 +68,9 @@ export default class Gyro extends Component {
         <div className="Gyro-x" style={gyroX}>
           <div className="Gyro-y" style={gyroY}>
             <div className="Gyro-pos">
+              <div className="Gyro-swish">
+                <ReactSVG src="./assets/gyro/gyro-swish.svg" />
+              </div>
               <div className="Gyro-fill-body">
                 <ReactSVG src="./assets/gyro/gyro-fill-body.svg" />
               </div>

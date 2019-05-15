@@ -1,0 +1,31 @@
+@import "src/styles/vars";
+
+.WhySlide2 {
+  background: $color-background-medium;
+  display: flex;
+  justify-content: center;
+  &-list {
+    margin-top: 40px;
+  }
+  .Page {
+    &-slide {
+      width: 80%;
+    }
+    &-image {
+    }
+    &-content {
+      width: 50%;
+    }
+  }
+  .Brain {
+
+    &-fill {
+      position: absolute;
+      top: -40px;
+      left: -50px;
+    }
+    &-outline {
+      position: relative;
+    }
+  }
+}

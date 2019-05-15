@@ -2,51 +2,50 @@ import React, { Component } from 'react';
 import _map from 'lodash/map';
 import "./App.scss";
 import Menu from './components/menu/Menu';
+import { Router, Link } from "@reach/router"
+import { WhyPage } from './pages/why/WhyPage';
 import { menu } from './config';
-import { WobblyController } from './components/wobbly-controller/WobblyController'
+// import { WobblyController } from './components/wobbly-controller/WobblyController'
 
 export class App extends Component {
-  wobblyLineApp = null;
-  wobblyLineContainer = null;
+  // wobblyLineApp = null;
+  // wobblyLineContainer = null;
   list = null
   containerLayer = null;
   lineLayer = null;
 
   createWobblyController() {
-    const wobblyController = new WobblyController({ containerEl: this.refs.wobblyLines, contentEl: this.refs.content });
-  }
-
-  addPages() {
-    const refs = [];
-    const pages = _map(menu, group => {
-      return _map(group.children, (page, i) => {
-        const Component = page.component;
-        let ref = '';
-        if (i === 0) {
-          ref = `page-${group.id}`;
-          refs.push({ ref: ref, id: group.id });
-        }
-        return <div key={i} className={ref} data-color={page.color}><Component /></div>
-      });
-    });
-    return { pages, refs };
+    // const wobblyController = new WobblyController({ containerEl: this.refs.wobblyLines, contentEl: this.refs.content });
   }
 
   componentDidMount() {
     this.createWobblyController();
   }
 
+  createRoutes() {
+    return _map(menu, page => {
+      const Component = page.component;
+      const Container = () => <Component />;
+      return <Container path={page.id} />
+    });
+  }
+
   render() {
-    const list = this.addPages();
+    const routes = this.createRoutes();
     return (
       <div className="App">
         <aside className="App-menu">
-          <Menu list={menu} listRefs={list.refs} />
+          app menu placeholder
         </aside>
         <content className="App-content" ref="content">
-          {list.pages}
+          <Router>
+            {routes}
+          </Router>
         </content>
-        <div className="App-lines" ref="wobblyLines"></div>
+        {/* <div className="App-lines" ref="wobblyLines"></div> */}
+        <footer className="App-footer">
+          footer
+        </footer>
       </div>
     )
   }

@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { Component } from 'react';
 import ReactSVG from 'react-svg';
 import { Blobber, resolveAnchors } from 'src/components/blobber/Blobber';
 import { List } from 'src/components/list/List';
 import { TAU } from 'src/utils/math';
-import { Page } from '../Page';
-import './Why2Page.scss';
+import './WhySlide2.scss';
 
 const brainFillPoints = [
   {
@@ -45,7 +44,7 @@ const brainFillPoints = [
   },
 ].map(resolveAnchors);
 
-export class Why2Page extends Page {
+export class WhySlide2 extends Component {
   componentDidMount() {
     this.createBrainFill();
   }
@@ -55,7 +54,7 @@ export class Why2Page extends Page {
     const height = 300; //244 * (1 + idleDistortion * 2);
     const x = 40;
     const y = 40;
-    const blob = new Blobber({ alpha: .2, color: 0x0, x, y, anchors: brainFillPoints });
+    const blob = new Blobber({ alpha: .5, color: 0xFA551E, x, y, anchors: brainFillPoints });
     blob.createCanvas({ transparent: true, width, height });
     this.refs.brain.appendChild(blob.getCanvas());
     blob.startWobbling({
@@ -70,27 +69,34 @@ export class Why2Page extends Page {
 
   render() {
     return (
-      <div className="Page Why2">
-        <div className="Page-image">
-          <div className="Why2-brainFill" ref="brain"/>
-          <div className="Why2-brainOutline">
-            <ReactSVG src="./assets/why/brain-placeholder.svg" />
+      <div className="WhySlide2">
+        <div className="Page-slide">
+          <div className="Page-content">
+            <p>According to the World Economic Forum there are <b>10 skills</b> that are <b>crucial to success</b> in our ever-changing digitally-driven business environment:</p>
+            <div className="WhySlide2-list">
+              <List color="0xFFFFFF">
+                <li>Complex Problem Solving</li>
+                <li>Critical Thinking</li>
+                <li>Creativity</li>
+                <li>People Management</li>
+                <li>Co-ordination with others</li>
+                <li>Emotional Intelligence - Empathy</li>
+                <li>Judgement and Decisions</li>
+                <li>Service orientation</li>
+                <li>Negotiations</li>
+                <li>Cognitive Flexibility</li>
+              </List>
+            </div>
           </div>
-        </div>
-        <div className="Page-content">
-          <p>According to the World Economic Forum there are <b>10 skills</b> that are <b>crucial to success</b> in our ever-changing digitally-driven business environment:</p>
-          <List color="#f0315a">
-            <li>Complex Problem Solving</li>
-            <li>Critical Thinking</li>
-            <li>Creativity</li>
-            <li>People Management</li>
-            <li>Co-ordination with others</li>
-            <li>Emotional Intelligence - Empathy</li>
-            <li>Judgement and Decisions</li>
-            <li>Service orientation</li>
-            <li>Negotiations</li>
-            <li>Cognitive Flexibility</li>
-          </List>
+
+          <div className="Page-image">
+            <div className="Brain">
+              <div className="Brain-fill" ref="brain"/>
+              <div className="Brain-outline">
+                <ReactSVG src="./assets/why/brain-placeholder.svg" />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     )

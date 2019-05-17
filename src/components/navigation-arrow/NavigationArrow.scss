@@ -1,0 +1,100 @@
+.Navigation {
+  position: absolute;
+  width: 100px;
+  height: 50px;
+
+  &--back {
+    left: 0;
+    top: 0;
+  }
+  &--next {
+    right: 0;
+    bottom: 0;
+    transform: translate(0, -20px);
+  }
+
+  cursor: pointer;
+  &-arrow {
+    position: absolute;
+  }
+  &--back &-arrow {
+    bottom: 20px;
+    right: 0;
+  }
+  &--next &-arrow {
+    top: 20px;
+    left: 0;
+  }
+  &--next &-arrow svg {
+    transform: rotate(180deg);
+  }
+  &:hover &-arrow {
+    animation: bounce-arrow .4s ease-out alternate infinite;
+  }
+  &-line {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: #fff;
+    &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background: #fff;
+      transition: transform .2s ease-out;
+      transform: scale(0, 1);
+    }
+  }
+  &--back &-line {
+    bottom: 0;
+  }
+  &--next &-line {
+    top: 0;
+  }
+  &--back &-line:after {
+    transform-origin: center right;
+  }
+  &--next &-line:after {
+    transform-origin: center left;
+  }
+
+  &--back:hover &-arrow {
+    animation: bounce-arrow-back .4s ease-out alternate infinite;
+  }
+
+  &--back:hover &-line:after {
+    transform: scale(1, 1);
+  }
+
+
+  &--next:hover &-arrow {
+    animation: bounce-arrow-next .4s ease-out alternate infinite;
+  }
+  &--next:hover &-line:after {
+    transform: scale(1, 1);
+  }
+
+  @keyframes bounce-arrow-back {
+    0% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(-20%, 0);
+    }
+  }
+
+  @keyframes bounce-arrow-next {
+    0% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(20%, 0);
+    }
+  }
+
+
+}

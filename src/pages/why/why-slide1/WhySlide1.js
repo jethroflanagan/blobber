@@ -11,12 +11,6 @@ export class WhySlide1 extends Component {
     return (
       <div className="WhySlide1">
         <div className="Page-slide">
-        <div className="Navigation">
-          <div className="Navigation-arrow">
-            <ReactSVG src="./assets/arrow-back.svg" />
-          </div>
-          <div className="Navigation-line"/>
-        </div>
           <div className="Page-content">
             <p>Our future is changing at an ever-accelerating rate thanks to technology. And nowhere is this more obvious than in the <b>workplace</b>.</p>
             <p>Across the globe business is transforming through the application of <b>technology</b>.</p>

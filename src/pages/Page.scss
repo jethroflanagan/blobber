@@ -47,13 +47,14 @@
     width: 100%;
     z-index: 10000;
   }
-}
-
-.Navigation {
-  position: absolute;
-  left: 0;
-  top: 0;
-  &-line {
-
+  &-navigation {
+    position: relative;
+    z-index: 1;
+    &--top {
+      top: 150px;
+    }
+    &--bottom {
+      // top: 150px;
+    }
   }
 }

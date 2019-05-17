@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import _map from 'lodash/map';
 import "./App.scss";
 import Menu from './components/menu/Menu';
-import { Router, Link } from "@reach/router"
+import { Router } from "@reach/router"
 import { WhyPage } from './pages/why/WhyPage';
 import { menu } from './config';
 // import { WobblyController } from './components/wobbly-controller/WobblyController'
@@ -25,8 +25,8 @@ export class App extends Component {
   createRoutes() {
     return _map(menu, page => {
       const Component = page.component;
-      const Container = () => <Component />;
-      return <Container path={page.id} />
+      const Container = () => <Component color={page.color}/>;
+      return <Container path={page.url || page.id} key={page.id} />
     });
   }
 

@@ -13,12 +13,12 @@ const offsetBlob = 400;
 export class WhereSlide2 extends Component {
   app = null;
   circles = [
-    { color: 0x500A28, radius: 290, label: 'Our world', id: 'world' },
-    { color: 0x640032, radius: 220, label: 'Our communities', id: 'community' },
-    { color: 0x870A3C, radius: 160, label: 'Absa as a whole', id: 'company' },
-    { color: 0xAF144B, radius: 110, label: 'Your vertical', id: 'vertical' },
-    { color: 0xF0325A, radius: 60, label: 'Your team', id: 'team' },
-    { color: 0xF05A7D, radius: 30, label: 'You', id: 'you' },
+    { color: 0x960528, radius: 290, label: 'Our world', id: 'world' },
+    { color: 0xBE0028, radius: 220, label: 'Our communities', id: 'community' },
+    { color: 0xDC0032, radius: 160, label: 'Absa as a whole', id: 'company' },
+    { color: 0xF52D28, radius: 110, label: 'Your vertical', id: 'vertical' },
+    { color: 0xFA551E, radius: 60, label: 'Your team', id: 'team' },
+    { color: 0xFF780F, radius: 30, label: 'You', id: 'you' },
   ];
   contentBlob = null;
   labels = [];
@@ -32,7 +32,7 @@ export class WhereSlide2 extends Component {
       transparent: true,
       // resolution: 1,
       // backgroundColor: 0x490924,
-      // autoResize: true,
+      autoResize: true,
     });
 
     this.state = {
@@ -43,6 +43,7 @@ export class WhereSlide2 extends Component {
 
     this.createBlobs();
     this.createLines();
+
   }
 
   createLines() {
@@ -197,7 +198,7 @@ export class WhereSlide2 extends Component {
 
   componentDidMount() {
     window.addEventListener('resize', this.onResize);
-    this.onResize();
+    // this.onResize();
 
     this.refs.blobs.appendChild(this.app.view);
 
@@ -392,14 +393,14 @@ export class WhereSlide2 extends Component {
 
     return (
       <div className="WhereSlide2">
-        <div className="Scope-blobs">
-          <div ref="blobs" className="Scope-blobCanvas"/>
-          <div className="Scope-labels">{labels}</div>
-        </div>
-        <div className="Page-image"> {/* keep content on right */}
+        <div className="WhereSlide2-blobs">
+          <div ref="blobs" className="WhereSlide2-blobCanvas"/>
+          <div className="WhereSlide2-labels">{labels}</div>
         </div>
         <div className="Page-content Scope-content">
-          {content}
+          <p>Our future is changing at an ever-accelerating rate thanks to technology. And nowhere is this more obvious than in the <b>workplace</b>.</p>
+          <p>Across the globe business is transforming through the application of <b>technology</b>.</p>
+          <p>So where will you be in 5 years’ time?</p>
         </div>
       </div>
     );

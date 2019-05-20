@@ -14,19 +14,19 @@ export class App extends Component {
   containerLayer = null;
   lineLayer = null;
 
-  createWobblyController() {
-    // const wobblyController = new WobblyController({ containerEl: this.refs.wobblyLines, contentEl: this.refs.content });
-  }
+  // createWobblyController() {
+  //   // const wobblyController = new WobblyController({ containerEl: this.refs.wobblyLines, contentEl: this.refs.content });
+  // }
 
   componentDidMount() {
-    this.createWobblyController();
+    // this.createWobblyController();
   }
 
   createRoutes() {
     return _map(menu, page => {
       const Component = page.component;
-      const Container = () => <Component />;
-      return <Container path={page.id} />
+      const Container = () => <Component color={page.color} />;
+      return <Container path={page.id} key={page.id} />
     });
   }
 
@@ -34,9 +34,9 @@ export class App extends Component {
     const routes = this.createRoutes();
     return (
       <div className="App">
-        <aside className="App-menu">
+        {/* <aside className="App-menu">
           app menu placeholder
-        </aside>
+        </aside> */}
         <content className="App-content" ref="content">
           <Router>
             {routes}
@@ -44,7 +44,7 @@ export class App extends Component {
         </content>
         {/* <div className="App-lines" ref="wobblyLines"></div> */}
         <footer className="App-footer">
-          footer
+          <a href="mailto:designthinking@absa.co.za">designthinking@absa.co.za</a> <a href="">Contact us</a> <a href="">Resources</a>
         </footer>
       </div>
     )

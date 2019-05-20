@@ -8,7 +8,7 @@ export const menu = [
     label: 'why?',
     id: 'why',
     component: WhyPage,
-    color: 0xF0325A,
+    color: '#FA551E',
   },
   // { label: 'where?',
   //   children: [
@@ -19,18 +19,18 @@ export const menu = [
     label: 'how?',
     id: 'how',
     component: How1Page,
-    color: 0xAF144B,
+    color: '#AF144B',
   },
   {
     label: 'case study',
     id: 'caseStudy',
     component: CaseStudies1Page,
-    color: 0x2D2323,
+    color: '#2D2323',
   },
   {
     label: 'resources',
     id: 'resources',
     component: ResourcesPage,
-    color: 0x2D2323,
+    color: '#2D2323',
   },
 ];

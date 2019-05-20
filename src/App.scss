@@ -1,3 +1,5 @@
+@import "src/styles/vars";
+
 .App {
   // display: flex;
   // flex-direction: column;
@@ -9,22 +11,19 @@
     padding: 20px;
   }
   &-footer {
-    background: #2D2323;
+    background: $color-background-dark;
     color: #fff;
     padding: 20px;
+    border-top: 3px solid #fff;
+    a {
+      color: #fff;
+      margin-right: 30px;
+      font-weight: 400;
+    }
   }
   &-content {
     flex-grow: 1;
     flex-shrink: 1;
     flex-basis: auto;
-  }
-  &-lines {
-    position: fixed;
-    overflow: hidden;
-    height: 100%;
-    width: calc(100% - 240px);
-    top: 0;
-    left: 240px;
-    pointer-events: none;
   }
 }

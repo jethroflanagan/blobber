@@ -4,9 +4,9 @@ export class WobblyLine {
   app = null;
   container = null;
   shapeWidth = 800;
-  shapeHeight = 140;
+  shapeHeight = 40;
   shapeOffsetX = 0;
-  shapeOffsetY = 70;
+  shapeOffsetY = 0;
   lineLayer = null;
   containerLayer = null;
   mouseX = null;
@@ -97,13 +97,17 @@ export class WobblyLine {
   }
 
   drawLine() {
+    const overflowWidth = 50;
+    const startX = -overflowWidth;
+    const width = this.shapeWidth + overflowWidth * 2;
     this.graphics.clear();
     this.graphics.beginFill(this.color);
     this.graphics.lineStyle(1, this.color, 1);
 
-    this.graphics.bezierCurveTo(0, 0, this.controlPoint.cpX, this.controlPoint.cpY, this.shapeWidth, 0);
-    this.graphics.lineTo(this.shapeWidth, this.shapeHeight);
-    this.graphics.lineTo(0, this.shapeHeight);
+    this.graphics.moveTo(startX, 0);
+    this.graphics.bezierCurveTo(startX, 0, this.controlPoint.cpX, this.controlPoint.cpY, width, 0);
+    this.graphics.lineTo(width, this.shapeHeight);
+    this.graphics.lineTo(startX, this.shapeHeight);
     this.graphics.closePath();
     this.graphics.endFill();
 

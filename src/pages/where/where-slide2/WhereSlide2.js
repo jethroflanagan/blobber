@@ -5,22 +5,20 @@ import { Blobber } from 'src/components/blobber/Blobber';
 import './WhereSlide2.scss';
 import { randomRange } from 'src/utils/random';
 
-const CONTENT_BLOB_TIME_RANGE = { min: 700, max: 2500 };
 const MAX_CIRCLE_RADIUS = 310;
-const CONTENT_BLOB_RADIUS = 4;
 const offsetBlob = 400;
+const CIRCLE_UNFOCUSED_RADIUS = 30;
 
 export class WhereSlide2 extends Component {
   app = null;
   circles = [
-    { color: 0x960528, radius: 290, label: 'Our world', id: 'world' },
+    { color: 0x960528, radius: 280, label: 'Our world', id: 'world' },
     { color: 0xBE0028, radius: 220, label: 'Our communities', id: 'community' },
     { color: 0xDC0032, radius: 160, label: 'Absa as a whole', id: 'company' },
     { color: 0xF52D28, radius: 110, label: 'Your vertical', id: 'vertical' },
     { color: 0xFA551E, radius: 60, label: 'Your team', id: 'team' },
     { color: 0xFF780F, radius: 30, label: 'You', id: 'you' },
   ];
-  contentBlob = null;
   labels = [];
 
   constructor() {
@@ -30,7 +28,6 @@ export class WhereSlide2 extends Component {
       height: 800,
       antialias: true,
       transparent: true,
-      // resolution: 1,
       // backgroundColor: 0x490924,
       autoResize: true,
     });
@@ -38,7 +35,6 @@ export class WhereSlide2 extends Component {
     this.state = {
       activeSection: null,
       labelPositions: [],
-      contentBlobAnchors: '',
     };
 
     this.createBlobs();
@@ -95,51 +91,6 @@ export class WhereSlide2 extends Component {
         timeRange: { min: 700, max: 2500 },
       });
       circle.blob = blob;
-    });
-    this.createContentBlob({ x, y });
-
-  }
-
-  createContentBlob({ x, y }) {
-
-    this.contentBlob = new Blobber({ alpha: 1, color: 0x0, x, y, anchors: this.createContentBlobAnchorPoints({ radius: CONTENT_BLOB_RADIUS }) });
-    // this.contentBlob.useSharedCanvas({ app: this.app });
-    this.contentBlob.createCanvas({ width: 800, height: 800, transparent: true });
-
-    this.contentBlob.startWobbling({
-      wobble: {
-          position: () => ({ min: -10, max: 10 }),
-          length: (length) => ({ min: length * .8, max: length * 1.2 }),
-          angle: (angle) => ({ min: -Math.PI / 20, max: Math.PI / 20 }),
-      },
-      timeRange: CONTENT_BLOB_TIME_RANGE,
-      updated: (blob) => this.onUpdateContentBlob(blob),
-    });
-  }
-
-  createContentBlobAnchorPoints({ radius }) {
-    const anchors = [];
-    const numPoints = 4;
-    for (let i = 0; i < numPoints; i++) {
-      // Subtract 45 degrees so anchors are in corners for content transition
-      const circleAngle = Math.PI * 2 * i / numPoints - Math.PI / 4;
-      const x = 0 + radius * Math.cos(circleAngle);
-      const y = 0 + radius * Math.sin(circleAngle);
-      anchors.push({
-        index: i, // for animation reference if needed
-        x,
-        y,
-        angle: circleAngle - Math.PI / 2, // tangent to circle, not the normal
-        lengthA: radius / 2,
-        lengthB: radius / 2,
-      });
-    }
-    return anchors;
-  }
-
-  onUpdateContentBlob({ anchors, x, y }) {
-    this.setState({
-      contentBlobAnchors: anchors,
     });
   }
 
@@ -198,7 +149,7 @@ export class WhereSlide2 extends Component {
 
   componentDidMount() {
     window.addEventListener('resize', this.onResize);
-    // this.onResize();
+    this.onResize();
 
     this.refs.blobs.appendChild(this.app.view);
 
@@ -229,12 +180,6 @@ export class WhereSlide2 extends Component {
     this.app.stage.removeChild(this.labelsLayer);
     this.setState({ activeSection });
 
-    this.contentBlob.changeColor(this.circles[activeSection].color);
-    this.contentBlob.updateWobble({
-      getTargets: (anchor) => this.setupAnchorPointAnimationTargets({ isActive: true, anchor, radius: 0 }),
-      timeRange: { min: 1500, max: 3000 },
-    });
-
     _map(this.circles, ({ blob, radius }, i) => {
       blob.updateWobble({
         getTargets: (anchor) => this.setupAnchorPointAnimationTargets({ isActive: false, anchor, circleRadius: radius }),
@@ -259,11 +204,6 @@ export class WhereSlide2 extends Component {
   resetBlobs() {
     this.setState({ activeSection: null });
     this.app.stage.addChild(this.labelsLayer);
-
-    this.contentBlob.updateWobble({
-      getTargets: null,
-      timeRange: CONTENT_BLOB_TIME_RANGE,
-    });
 
     _map(this.circles, ({ blob }, i) => {
       // blob.stopWobbling();
@@ -322,7 +262,7 @@ export class WhereSlide2 extends Component {
     else {
       // x = 0;
       // y = 0;
-      const radius =  Math.pow(2, circleRadius / MAX_CIRCLE_RADIUS) * 130
+      const radius =  Math.pow(2, circleRadius / MAX_CIRCLE_RADIUS) * CIRCLE_UNFOCUSED_RADIUS;
       lengthA = radius / 2 + randomRange(-2, 2);
       lengthB = radius / 2 + randomRange(-2, 2);
       const circleAngle = Math.PI * 2 * index / 4;
@@ -349,19 +289,17 @@ export class WhereSlide2 extends Component {
     const height = el.offsetHeight;
     this.app.renderer.resize(width, height);
 
-    const x = width / 2 - 300;
+    const x = width / 3;
     const y = height / 2;
 
     _map(this.circles, circle => {
       circle.blob.moveTo(x, y);
     });
-    this.contentBlob.moveTo(x + offsetBlob, y);
   }
 
   render() {
     const { activeSection } = this.state;
     let content = null;
-    const contentBlobAnchorsOffset = {x:0, y: 200};
     if (activeSection == null) {
       content = (<div/>
         // <ScopeContent title="Oh my gosh" content={`

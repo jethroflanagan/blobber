@@ -10,7 +10,7 @@ export class WobblyController {
   mouseY = null;
   pages = [];
   scrollPosition = 0;
-  shapeHeight = 60;
+  overflowHeight = 60;
   shapeOffsetX = 0;
 
   constructor({ containerEl, contentEl }) {
@@ -57,7 +57,7 @@ export class WobblyController {
   updateLines() {
     for (const item of this.pages) {
       const { line, page } = item;
-      line.update(this.shapeOffsetX, page.offsetTop - this.scrollPosition, page.offsetWidth, page.offsetHeight + this.shapeHeight);
+      line.update(this.shapeOffsetX, page.offsetTop - this.scrollPosition, page.offsetWidth, page.offsetHeight + this.overflowHeight * 1.5, this.overflowHeight);
     }
   }
 

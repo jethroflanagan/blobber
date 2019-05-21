@@ -50,12 +50,12 @@ export class WobblyLine {
     }
   }
 
-  update(offsetX, offsetY, offsetWidth, offsetHeight) {
+  update(offsetX, offsetY, offsetWidth, offsetHeight, dragDistanceLimit) {
     this.shapeOffsetX = offsetX;
     this.shapeOffsetY = offsetY;
     this.shapeWidth = offsetWidth;
     this.shapeHeight = offsetHeight;
-
+    this.dragDistanceLimit = dragDistanceLimit;
     this.doHitTest();
     this.updateLine();
   }
@@ -100,12 +100,23 @@ export class WobblyLine {
     const overflowWidth = 50;
     const startX = -overflowWidth;
     const width = this.shapeWidth + overflowWidth * 2;
+    const dropSize = Math.min(300, width / 2);
+
     this.graphics.clear();
     this.graphics.beginFill(this.color);
     this.graphics.lineStyle(1, this.color, 1);
 
     this.graphics.moveTo(startX, 0);
-    this.graphics.bezierCurveTo(startX, 0, this.controlPoint.cpX, this.controlPoint.cpY, width, 0);
+
+    // this.graphics.bezierCurveTo(startX, 0, this.controlPoint.cpX, this.controlPoint.cpY, width, 0);
+
+    // previous bezier:
+    this.graphics.lineTo(this.controlPoint.cpX - dropSize * 2, 0);
+    this.graphics.bezierCurveTo(this.controlPoint.cpX - dropSize, 0, this.controlPoint.cpX - dropSize / 2, this.controlPoint.cpY, this.controlPoint.cpX, this.controlPoint.cpY);
+    this.graphics.bezierCurveTo(this.controlPoint.cpX + dropSize / 2, this.controlPoint.cpY, this.controlPoint.cpX + dropSize, 0, this.controlPoint.cpX + dropSize * 2, 0);
+    this.graphics.lineTo(width, 0);
+
+
     this.graphics.lineTo(width, this.shapeHeight);
     this.graphics.lineTo(startX, this.shapeHeight);
     this.graphics.closePath();

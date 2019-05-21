@@ -4,6 +4,7 @@ import { Blobber, resolveAnchors } from 'src/components/blobber/Blobber';
 import { List } from 'src/components/list/List';
 import { TAU } from 'src/utils/math';
 import './WhySlide2.scss';
+import { wobblyLineProps } from '../../Page';
 
 const brainFillPoints = [
   {
@@ -69,7 +70,7 @@ export class WhySlide2 extends Component {
 
   render() {
     return (
-      <div className="WhySlide2">
+      <div className="WhySlide2" {...wobblyLineProps({ color: this.props.color })}>
         <div className="Page-slide">
           <div className="Page-content">
             <p>According to the World Economic Forum there are <b>10 skills</b> that are <b>crucial to success</b> in our ever-changing digitally-driven business environment:</p>

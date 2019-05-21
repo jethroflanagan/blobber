@@ -4,6 +4,7 @@ import { Blobber, resolveAnchors } from 'src/components/blobber/Blobber';
 import { TAU } from 'src/utils/math';
 import { Page } from 'src/pages/Page';
 import './WhySlide3.scss';
+import { wobblyLineProps } from '../../Page';
 
 export class WhySlide3 extends Page {
   componentDidMount() {
@@ -11,7 +12,7 @@ export class WhySlide3 extends Page {
 
   render() {
     return (
-      <div className="WhySlide3">
+      <div className="WhySlide3" {...wobblyLineProps({ color: this.props.color })}>
         <div className="Page-slide">
           <div className="Page-content">
             <p><b>Design Thinking is your pathway to learning and acquiring these skills.</b></p>

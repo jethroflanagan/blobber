@@ -57,7 +57,7 @@ export class WobblyController {
   updateLines() {
     for (const item of this.pages) {
       const { line, page } = item;
-      line.update(this.shapeOffsetX, page.offsetTop + page.offsetHeight - this.scrollPosition - this.shapeHeight, page.offsetWidth, this.shapeHeight);
+      line.update(this.shapeOffsetX, page.offsetTop - this.scrollPosition, page.offsetWidth, page.offsetHeight + this.shapeHeight);
     }
   }
 

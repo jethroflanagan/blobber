@@ -111,9 +111,16 @@ export class WobblyLine {
     // this.graphics.bezierCurveTo(startX, 0, this.controlPoint.cpX, this.controlPoint.cpY, width, 0);
 
     // previous bezier:
-    this.graphics.lineTo(this.controlPoint.cpX - dropSize * 2, 0);
-    this.graphics.bezierCurveTo(this.controlPoint.cpX - dropSize, 0, this.controlPoint.cpX - dropSize / 2, this.controlPoint.cpY, this.controlPoint.cpX, this.controlPoint.cpY);
-    this.graphics.bezierCurveTo(this.controlPoint.cpX + dropSize / 2, this.controlPoint.cpY, this.controlPoint.cpX + dropSize, 0, this.controlPoint.cpX + dropSize * 2, 0);
+    const dropStartX = Math.max(this.controlPoint.cpX - dropSize * 2, startX);
+    const dropStartControlX = Math.max(this.controlPoint.cpX - dropSize, startX);
+    const dropCenterControlX1 = Math.max(this.controlPoint.cpX - dropSize / 2, startX);
+    const dropCenterControlX2 = Math.min(this.controlPoint.cpX + dropSize / 2, width);
+    const dropEndControlX = Math.min(this.controlPoint.cpX + dropSize, width);
+    const dropEndX = Math.min(this.controlPoint.cpX + dropSize * 2, width);
+
+    this.graphics.lineTo(dropStartX, 0);
+    this.graphics.bezierCurveTo(dropStartControlX, 0, dropCenterControlX1, this.controlPoint.cpY, this.controlPoint.cpX, this.controlPoint.cpY);
+    this.graphics.bezierCurveTo(dropCenterControlX2, this.controlPoint.cpY, dropEndControlX, 0, dropEndX, 0);
     this.graphics.lineTo(width, 0);
 
 

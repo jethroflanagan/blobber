@@ -5,12 +5,17 @@ export const menu = [
   {
     id: 'why',
     component: WhyPage,
-    color: "#FA551E",
+    color: '#FA551E',
   },
   {
     id: 'where',
     component: WherePage,
     color: "#F52D28",
+  },
+  {
+    id: 'resources',
+    component: ResourcesPage,
+    color: '#2D2323',
   },
   // {
   //   id: 'how',

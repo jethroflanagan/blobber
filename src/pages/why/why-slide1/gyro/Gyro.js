@@ -20,7 +20,7 @@ export default class Gyro extends Component {
   }
 
   componentDidMount() {
-    document.addEventListener('mousemove', e => this.onMouseMove(e));
+    // document.addEventListener('mousemove', e => this.onMouseMove(e));
     const bounds = this.refs.container.getBoundingClientRect();
     this.setState({
       x: bounds.x,

@@ -17,6 +17,7 @@ export class WobblyLine {
   touchStart = false;
   elasticInProgress = false;
   dragDistanceLimit = 60;
+  dropSize = 400;
   controlPoint = {
     cpX: 0,
     cpY: 0
@@ -104,7 +105,7 @@ export class WobblyLine {
     const overflowWidth = 50;
     const startX = -overflowWidth;
     const width = this.shapeWidth + overflowWidth * 2;
-    const dropSize = Math.min(300, width / 2);
+    const dropSize = Math.min(this.dropSize, width / 2);
 
     this.graphics.clear();
     this.graphics.beginFill(this.color);

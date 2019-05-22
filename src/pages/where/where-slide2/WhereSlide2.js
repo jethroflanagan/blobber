@@ -5,9 +5,10 @@ import { Blobber } from 'src/components/blobber/Blobber';
 import './WhereSlide2.scss';
 import { randomRange } from 'src/utils/random';
 import { wobblyLineProps } from 'src/pages/slide';
+import ReactSVG from 'react-svg';
 
 const MAX_CIRCLE_RADIUS = 310;
-const offsetBlob = 400;
+const offsetBlob = -300;
 const CIRCLE_UNFOCUSED_RADIUS = 30;
 
 export class WhereSlide2 extends Component {
@@ -203,6 +204,7 @@ export class WhereSlide2 extends Component {
   }
 
   resetBlobs() {
+    console.log('click');
     this.setState({ activeSection: null });
     this.app.stage.addChild(this.labelsLayer);
 
@@ -302,28 +304,19 @@ export class WhereSlide2 extends Component {
     const { activeSection } = this.state;
     let content = null;
     if (activeSection == null) {
-      content = (<div/>
-        // <ScopeContent title="Oh my gosh" content={`
-        //   Our future is changing at an ever-accelerating rate thanks to technology. And nowhere is this more obvious than in the <b>workplace</b>.
-        //   Across the globe business is transforming through the application of <b>technology</b>.
-        //   So where will you be in 5 years’ time?
-        //   `}
-        //   maskAnchors={this.state.contentBlobAnchors}maskOffset={contentBlobAnchorsOffset}/>
-      );
+      content = <div/>;
     }
     else {
       const section = this.circles[activeSection];
 
       content = (
-
         <div>
-          <div className="Page-title Scope-title">
-            <div className="Scope-reset" onClick={()=>this.resetBlobs()}>&lt;</div>
+          <div className="Blob-reset" onClick={()=>this.resetBlobs()}>
+            <ReactSVG src="./assets/arrow-back.svg"  />
           </div>
-          {/* <ScopeContent title={section.label} content={`
-          All of the words blah blah
-          `}
-          maskAnchors={this.state.contentBlobAnchors} maskOffset={contentBlobAnchorsOffset}/> */}
+          <p>Our future is changing at an ever-accelerating rate thanks to technology. And nowhere is this more obvious than in the <b>workplace</b>.</p>
+          <p>Across the globe business is transforming through the application of <b>technology</b>.</p>
+          <p>So where will you be in 5 years’ time?</p>
         </div>
       );
     }
@@ -334,12 +327,10 @@ export class WhereSlide2 extends Component {
       <div className="WhereSlide2" { ...wobblyLineProps({ color: this.props.color }) }>
         <div className="WhereSlide2-blobs">
           <div ref="blobs" className="WhereSlide2-blobCanvas"/>
-          <div className="WhereSlide2-labels">{labels}</div>
+          <div className="WhereSlide2-labels">{!activeSection ? labels : null}</div>
         </div>
-        <div className="Page-content Scope-content">
-          <p>Our future is changing at an ever-accelerating rate thanks to technology. And nowhere is this more obvious than in the <b>workplace</b>.</p>
-          <p>Across the globe business is transforming through the application of <b>technology</b>.</p>
-          <p>So where will you be in 5 years’ time?</p>
+        <div className="Page-content">
+          {content}
         </div>
       </div>
     );

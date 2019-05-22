@@ -28,6 +28,9 @@ export class WherePage extends Page {
           <WhereSlide1 color={SLIDE_COLOR_DARK} />
           <WhereSlide2 color={SLIDE_COLOR_MEDIUM} />
           <NavigationArrow color={color} direction="next" url="/how" />
+          <footer className="App-footer" data-color={color}>
+            <a href="mailto:designthinking@absa.co.za">designthinking@absa.co.za</a> <a href="">Contact us</a> <a href="">Resources</a>
+          </footer>
         </div>
       </div>
     );

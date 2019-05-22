@@ -43,9 +43,7 @@ export class App extends Component {
           </Router>
         </content>
         {/* <div className="App-lines" ref="wobblyLines"></div> */}
-        <footer className="App-footer">
-          <a href="mailto:designthinking@absa.co.za">designthinking@absa.co.za</a> <a href="">Contact us</a> <a href="">Resources</a>
-        </footer>
+
       </div>
     )
   }

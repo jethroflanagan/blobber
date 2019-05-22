@@ -10,7 +10,7 @@ export class WobblyController {
   mouseY = null;
   pages = [];
   scrollPosition = 0;
-  overflowHeight = 60;
+  overflowHeight = 30;
   shapeOffsetX = 0;
 
   constructor({ containerEl, contentEl }) {

@@ -46,7 +46,7 @@ export class List extends Component {
       const x = width / 2;
       const y = height / 2;
       const radius = BULLET_SIZE / 2;
-      const blob = new Blobber({ alpha: .4, color: 0xffffff, x, y, radius, idleDistortion: BLOB_IDLE_DISTORTION });
+      const blob = new Blobber({ alpha: .5, color: this.props.color, x, y, radius, idleDistortion: BLOB_IDLE_DISTORTION });
 
       blob.createCanvas({ transparent: true, width, height });
 

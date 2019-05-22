@@ -8,18 +8,6 @@ import _cloneDeep from 'lodash/cloneDeep';
 const TAU = Math.PI * 2;
 const noOp = noOp;
 
-export function resolveAnchors(anchor) {
-  const { x, y, control1, control2 } = anchor;
-  const angle = getAngle(control1.x, control1.y, control2.x, control2.y);
-  return {
-    x,
-    y,
-    angle,
-    lengthA: getDistance(x, y, control2.x, control2.y),
-    lengthB: getDistance(x, y, control1.x, control1.y),
-  };
-}
-
 export class Blobber {
   layers = {
     container: null,

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@reach/router": "^1.2.1",
     "firebase-tools": "^6.7.1",
     "node-sass": "^4.11.0",
     "react": "^16.8.6",
@@ -28,6 +29,7 @@
     "animejs": "^3.0.1",
     "lodash": "^4.17.11",
     "pixi.js": "^4.8.7",
-    "react-svg": "^9.0.2"
+    "react-svg": "^9.0.2",
+    "react-test-renderer": "^16.8.6"
   }
 }

@@ -10,8 +10,8 @@ export class WobblyController {
   mouseY = null;
   pages = [];
   scrollPosition = 0;
-  shapeHeight = 140;
-  shapeOffsetX = 240;
+  overflowHeight = 30;
+  shapeOffsetX = 0;
 
   constructor({ containerEl, contentEl }) {
     this.containerEl = containerEl;
@@ -21,7 +21,7 @@ export class WobblyController {
       height: 800,
       antialias: true,
       transparent: true,
-      resolution: 1
+      resolution: 1,
     });
 
     this.containerEl.appendChild(this.app.view);
@@ -35,7 +35,7 @@ export class WobblyController {
 
     window.addEventListener('mousemove', e => this.onMouseMove(e));
     window.addEventListener('resize', _ => this.resize());
-    contentEl.addEventListener('scroll', _ => this.onScroll());
+    window.addEventListener('scroll', _ => this.onScroll());
 
     this.resize();
   }
@@ -57,13 +57,12 @@ export class WobblyController {
   updateLines() {
     for (const item of this.pages) {
       const { line, page } = item;
-
-      item.line.update(this.shapeOffsetX, page.offsetTop + page.offsetHeight - this.scrollPosition - (this.shapeHeight / 2), page.offsetWidth, this.shapeHeight);
+      line.update(this.shapeOffsetX, page.offsetTop - this.scrollPosition, page.offsetWidth, page.offsetHeight + this.overflowHeight * 1.5, this.overflowHeight);
     }
   }
 
   onScroll(e) {
-    this.scrollPosition = this.contentEl.scrollTop;
+    this.scrollPosition = window.scrollY;
     this.updateLines();
   }
 

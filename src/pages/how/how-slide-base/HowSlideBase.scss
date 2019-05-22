@@ -1,0 +1,26 @@
+@import "src/styles/vars";
+
+.HowSlide {
+  .Page-content {
+    width: 40%;
+  }
+  .Page-image {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 50px;
+  }
+  &-blob {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  &-image {
+    position: relative;
+  }
+}

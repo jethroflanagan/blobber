@@ -1,12 +1,9 @@
-import React from 'react';
+import React, { Component } from 'react';
 import ReactSVG from 'react-svg';
-import { Blobber, resolveAnchors } from 'src/components/blobber/Blobber';
-import { TAU } from 'src/utils/math';
-import { Page } from 'src/pages/Page';
+import { wobblyLineProps } from 'src/pages/slide';
 import './WhySlide3.scss';
-import { wobblyLineProps } from '../../Page';
 
-export class WhySlide3 extends Page {
+export class WhySlide3 extends Component {
   componentDidMount() {
   }
 

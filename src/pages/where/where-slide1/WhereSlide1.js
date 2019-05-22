@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './WhereSlide1.scss';
 import ReactSVG from 'react-svg';
+import { wobblyLineProps } from 'src/pages/slide';
 
 export class WhereSlide1 extends Component {
   componentDidMount() {
@@ -8,7 +9,7 @@ export class WhereSlide1 extends Component {
 
   render() {
     return (
-      <div className="WhereSlide1">
+      <div className="WhereSlide1" { ...wobblyLineProps({ color: this.props.color }) }>
         <div className="Page-slide">
           <div className="Page-content">
             <p><b>Where can you use design thinking?</b></p>

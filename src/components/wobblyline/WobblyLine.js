@@ -66,7 +66,11 @@ export class WobblyLine {
       this.controlPoint.cpY = this.mouseY - this.shapeOffsetY;
 
       // Check if the line has been dragged past the limit
-      if (Math.abs(this.controlPoint.cpY) > this.dragDistanceLimit) {
+      const controlDistanceY = Math.abs(this.controlPoint.cpY);
+      if (controlDistanceY > this.dragDistanceLimit) {
+        // hard limit so the line doesn't extend beyond dragLimit
+        this.controlPoint.cpY = Math.min(controlDistanceY, this.dragDistanceLimit) * (this.controlPoint.cpY > 0 ? 1 : -1);
+
         this.touchStart = false;
 
         if (!this.elasticInProgress) {

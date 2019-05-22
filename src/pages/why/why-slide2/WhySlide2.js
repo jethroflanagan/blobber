@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import ReactSVG from 'react-svg';
-import { Blobber, resolveAnchors } from 'src/components/blobber/Blobber';
+import { Blobber } from 'src/components/blobber/Blobber';
 import { List } from 'src/components/list/List';
 import { TAU } from 'src/utils/math';
 import './WhySlide2.scss';
-import { wobblyLineProps } from '../../Page';
+import { wobblyLineProps } from 'src/pages/slide';
+import { resolveAnchor } from 'src/utils/math';
 
 const brainFillPoints = [
   {
@@ -43,7 +44,7 @@ const brainFillPoints = [
     x: 34.37,
     y: 49.76,
   },
-].map(resolveAnchors);
+].map(resolveAnchor);
 
 export class WhySlide2 extends Component {
   componentDidMount() {

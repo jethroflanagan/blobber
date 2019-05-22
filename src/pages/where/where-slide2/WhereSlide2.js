@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { Blobber } from 'src/components/blobber/Blobber';
 import './WhereSlide2.scss';
 import { randomRange } from 'src/utils/random';
+import { wobblyLineProps } from 'src/pages/slide';
 
 const MAX_CIRCLE_RADIUS = 310;
 const offsetBlob = 400;
@@ -330,7 +331,7 @@ export class WhereSlide2 extends Component {
     const labels = this.createLabels();
 
     return (
-      <div className="WhereSlide2">
+      <div className="WhereSlide2" { ...wobblyLineProps({ color: this.props.color }) }>
         <div className="WhereSlide2-blobs">
           <div ref="blobs" className="WhereSlide2-blobCanvas"/>
           <div className="WhereSlide2-labels">{labels}</div>

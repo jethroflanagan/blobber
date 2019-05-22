@@ -27,3 +27,18 @@ export const getShortAngle = (angle1, angle2) => {
 export const clamp = (value, min=0, max=1) => {
   return Math.max(min || 0, Math.min(max, value));
 }
+
+// 0x000000 -> #000000
+export const rgbToHex = (rgb) => '#' + rgb.toString(16).padStart(6, '0').toUpperCase();
+
+export function resolveAnchor(anchor) {
+  const { x, y, control1, control2 } = anchor;
+  const angle = getAngle(control1.x, control1.y, control2.x, control2.y);
+  return {
+    x,
+    y,
+    angle,
+    lengthA: getDistance(x, y, control2.x, control2.y),
+    lengthB: getDistance(x, y, control1.x, control1.y),
+  };
+}

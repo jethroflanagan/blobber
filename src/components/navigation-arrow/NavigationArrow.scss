@@ -1,3 +1,14 @@
+.Navigation-container {
+  position: relative;
+  z-index: 1;
+  &--top {
+    top: 150px;
+  }
+  &--bottom {
+    // top: 150px;
+  }
+}
+
 .Navigation {
   position: absolute;
   width: 100px;

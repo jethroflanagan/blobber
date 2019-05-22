@@ -1,8 +1,10 @@
 import React from 'react';
+import { NavigationArrow } from 'src/components/navigation-arrow/NavigationArrow';
+import { PageHeader } from 'src/components/page-header/PageHeader';
 import { Page } from 'src/pages/Page';
+import { SLIDE_COLOR_DARK, SLIDE_COLOR_MEDIUM } from 'src/pages/slide';
 import { WhereSlide1 } from './where-slide1/WhereSlide1';
 import { WhereSlide2 } from './where-slide2/WhereSlide2';
-import { NavigationArrow } from 'src/components/navigation-arrow/NavigationArrow';
 import './WherePage.scss';
 
 export class WherePage extends Page {
@@ -11,20 +13,20 @@ export class WherePage extends Page {
   }
 
   componentDidMount() {
+    this.createWobblyLines({ containerEl: this.refs.wobblyLines, contentEl: this.refs.content });
   }
 
   render() {
     const { color } = this.props;
 
     return (
-      <div className="Page" style={{background: color }}>
-        <h1 className="Page-header"><div className="Page-headerLead">Put it</div>Into Practice</h1>
-        <div className="Page-navigation Page-navigation--top">
+      <div>
+        <div className="Page-wobbles" ref="wobblyLines"></div>
+        <div className="Page" ref="content">
+          <PageHeader lead="Put It" title="Into Practice" color={color}/>
           <NavigationArrow color={color} direction="back" url="/why" />
-        </div>
-        <WhereSlide1 />
-        <WhereSlide2 />
-        <div className="Page-navigation Page-navigation--bottom">
+          <WhereSlide1 color={SLIDE_COLOR_DARK} />
+          <WhereSlide2 color={SLIDE_COLOR_MEDIUM} />
           <NavigationArrow color={color} direction="next" url="/how" />
         </div>
       </div>

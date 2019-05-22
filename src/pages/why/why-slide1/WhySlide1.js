@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Gyro from './gyro/Gyro';
 import './WhySlide1.scss';
 import ReactSVG from 'react-svg';
-import { wobblyLineProps } from '../../Page';
+import { wobblyLineProps } from 'src/pages/slide';
 
 export class WhySlide1 extends Component {
   componentDidMount() {

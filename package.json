@@ -29,6 +29,7 @@
     "animejs": "^3.0.1",
     "lodash": "^4.17.11",
     "pixi.js": "^4.8.7",
-    "react-svg": "^9.0.2"
+    "react-svg": "^9.0.2",
+    "react-test-renderer": "^16.8.6"
   }
 }

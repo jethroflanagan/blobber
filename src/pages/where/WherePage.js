@@ -1,6 +1,4 @@
 import React from 'react';
-import { NavigationArrow } from 'src/components/navigation-arrow/NavigationArrow';
-import { PageHeader } from 'src/components/page-header/PageHeader';
 import { Page } from 'src/pages/Page';
 import { SLIDE_COLOR_DARK, SLIDE_COLOR_MEDIUM } from 'src/pages/slide';
 import { WhereSlide1 } from './where-slide1/WhereSlide1';
@@ -13,26 +11,21 @@ export class WherePage extends Page {
   }
 
   componentDidMount() {
-    this.createWobblyLines({ containerEl: this.refs.wobblyLines, contentEl: this.refs.content });
+    this.createWobblyLines();
   }
 
   render() {
-    const { color } = this.props;
-
     return (
-      <div>
-        <div className="Page-wobbles" ref="wobblyLines"></div>
-        <div className="Page" ref="content">
-          <PageHeader lead="Put It" title="Into Practice" color={color}/>
-          <NavigationArrow color={color} direction="back" url="/why" />
+      this.createPage({
+        lead: 'Put it',
+        title: 'Into practice',
+        slides: <>
           <WhereSlide1 color={SLIDE_COLOR_DARK} />
           <WhereSlide2 color={SLIDE_COLOR_MEDIUM} />
-          <NavigationArrow color={color} direction="next" url="/how" />
-          <footer className="App-footer" data-color={color}>
-            <a href="mailto:designthinking@absa.co.za">designthinking@absa.co.za</a> <a href="">Contact us</a> <a href="">Resources</a>
-          </footer>
-        </div>
-      </div>
+        </>,
+        backUrl: '/why',
+        nextUrl: '/how',
+      })
     );
   }
 }

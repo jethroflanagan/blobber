@@ -1,3 +1,4 @@
+import { HowPage } from './pages/how/HowPage';
 import { WherePage } from './pages/where/WherePage';
 import { WhyPage } from "./pages/why/WhyPage";
 
@@ -17,11 +18,11 @@ export const menu = [
   //   component: ResourcesPage,
   //   color: '#2D2323',
   // },
-  // {
-  //   id: 'how',
-  //   component: How1Page,
-  //   color: "#AF144B",
-  // },
+  {
+    id: 'how',
+    component: HowPage,
+    color: 0xAF144B,
+  },
   // {
   //   id: 'case-study',
   //   component: CaseStudies1Page,

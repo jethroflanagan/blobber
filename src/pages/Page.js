@@ -9,6 +9,7 @@ export class Page extends Component {
   wobblyController = null;
 
   componentDidMount() {
+    this.createWobblyLines();
   }
 
   createWobblyLines({ containerEl = null, contentEl = null } = {}) {
@@ -20,6 +21,8 @@ export class Page extends Component {
 
   createPage({ lead, title, slides, backUrl, nextUrl }) {
     const color = this.props.color;
+    backUrl = backUrl || this.props.backUrl;
+    nextUrl = nextUrl || this.props.nextUrl;
     return (
       <div>
         <div className="Page-wobbles" ref="wobblyLines"></div>

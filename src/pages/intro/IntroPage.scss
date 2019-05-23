@@ -1,0 +1,50 @@
+.Intro {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 100px;
+  &-logos {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    & > * {
+      margin-right: 50px;
+    }
+  }
+  &-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  &-arrow {
+    position: absolute;
+    right: 0;
+    top: 50%;
+  }
+
+  &-quote {
+    position: relative;
+    color: #fff;
+    margin: 100px;
+    width: 50%;
+    font-weight: 400;
+    &Text {
+      position: relative;
+      font-size: 45px;
+    }
+    &Author {
+      position: relative;
+      margin-top: 50px;
+      font-size: 20px;
+    }
+    &Mark {
+      position: absolute;
+      left: -100px;
+      top: -100px;
+    }
+  }
+}

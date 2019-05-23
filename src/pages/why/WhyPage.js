@@ -11,10 +11,6 @@ export class WhyPage extends Page {
     super();
   }
 
-  componentDidMount() {
-    this.createWobblyLines({ containerEl: this.refs.wobblyLines, contentEl: this.refs.content });
-  }
-
   render() {
     return (
       this.createPage({
@@ -25,8 +21,6 @@ export class WhyPage extends Page {
           <WhySlide2 color={SLIDE_COLOR_MEDIUM} />
           <WhySlide3 color={SLIDE_COLOR_DARK} />
         </>,
-        backUrl: '/',
-        nextUrl: '/where',
       })
     );
   }

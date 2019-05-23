@@ -6,14 +6,6 @@ import { WhereSlide2 } from './where-slide2/WhereSlide2';
 import './WherePage.scss';
 
 export class WherePage extends Page {
-  constructor() {
-    super();
-  }
-
-  componentDidMount() {
-    this.createWobblyLines();
-  }
-
   render() {
     return (
       this.createPage({
@@ -23,8 +15,6 @@ export class WherePage extends Page {
           <WhereSlide1 color={SLIDE_COLOR_DARK} />
           <WhereSlide2 color={SLIDE_COLOR_MEDIUM} />
         </>,
-        backUrl: '/why',
-        nextUrl: '/how',
       })
     );
   }

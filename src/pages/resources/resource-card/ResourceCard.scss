@@ -1,0 +1,33 @@
+@import "src/styles/vars";
+
+.ResourceCard {
+  $tween: .2s ease-out;
+  display: inline-flex;
+  flex-direction: column;
+  padding: 40px;
+  background: #443737;
+  color: #fff;
+  border-radius: 4px;
+  width: 300px;
+  box-shadow: 0 0 0 transparent;
+  transition: transform $tween, box-shadow $tween;
+  &:hover {
+    box-shadow: 5px 5px 20px rgba(0,0,0,.2);
+    transform: scale(1.1);
+  }
+
+  &:not(:last-child) {
+    margin-right: 40px;
+  }
+  &-title {
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 27px;
+  }
+  &-content {
+    font-size: 16px;
+    line-height: 24px;
+    margin: 20px 0;
+    flex: 1;
+  }
+}

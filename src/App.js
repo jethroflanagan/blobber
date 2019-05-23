@@ -25,13 +25,14 @@ export class App extends Component {
   createRoutes() {
     return _map(menu, page => {
       const Component = page.component;
-      const Container = () => <Component color={page.color}/>;
-      return <Container path={page.url || page.id} key={page.id} />
+      const Container = () => <Component color={page.color} nextUrl={page.nextUrl} backUrl={page.backUrl} />;
+      return <Container path={page.url != null ? page.url : page.id} key={page.id} />
     });
   }
 
   render() {
     const routes = this.createRoutes();
+    console.log(routes);
     return (
       <div className="App">
         {/* <aside className="App-menu">

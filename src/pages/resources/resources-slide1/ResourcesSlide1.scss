@@ -1,0 +1,16 @@
+@import "src/styles/vars";
+
+.ResourcesSlide1 {
+  .Page-content {
+    width: 40%;
+    margin-right: 100px;
+  }
+  &-cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    & > * {
+      margin-bottom: 40px;
+    }
+  }
+}

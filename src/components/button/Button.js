@@ -5,9 +5,9 @@ import "./Button.scss";
 export class Button extends React.Component {
 
   render() {
-    const { children, icon } = this.props;
+    const { children, icon, transparent } = this.props;
     return (
-      <div className="Button">
+      <div className={`Button ${transparent ? 'Button--transparent': ''}`}>
         <span className="Button-icon"><ReactSVG src={icon} /></span>
         <span className="Button-label">{children}</span>
       </div>

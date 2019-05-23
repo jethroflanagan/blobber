@@ -27,8 +27,6 @@ export class HowPage extends Page {
           <HowSlide3 color={SLIDE_COLOR_DARK} />
           <HowSlide4 color={SLIDE_COLOR_MEDIUM} />
         </>,
-        backUrl: '/where',
-        nextUrl: '/case-studies',
       })
     );
   }

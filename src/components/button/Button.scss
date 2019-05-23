@@ -5,12 +5,32 @@
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  background: $color-cta;
-  color: #fff;
+  background: #fff;
+  & svg > g {
+    fill: $color-cta;
+  }
+  &--transparent {
+    background: transparent;
+    color: $color-cta;
+    & svg {
+      fill: $color-cta;
+    }
+  }
+  font-weight: 400;
+  color: $color-cta;
   border-color: transparent;
-  transition: background $tween;
+  transition: background $tween, border-color $tween;
+  border: 1px solid transparent;
   &:focus, &:hover {
-    background: $color-cta-focus;
+    background: $color-cta;
+    color: #fff;
+    & svg > g {
+      fill: #fff;
+    }
+  }
+  &--transparent:focus, &--transparent:hover {
+    background: transparent;
+    border-color: #fff;
   }
   border: 1px solid transparent;
   height: 48px;
@@ -27,7 +47,6 @@
     transition: transform $tween;
   }
   &:focus &-label, &:hover &-label {
-    background: $color-cta-focus;
     transform: scale(1.1);
   }
   &:focus &-icon, &:hover &-icon {
